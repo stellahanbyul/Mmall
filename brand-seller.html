@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>M Seller Center — 브랜드</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --gray-50: #f5f4f1;
+  --gray-100: #e8e7e3;
+  --gray-200: #c8c7c2;
+  --gray-400: #888780;
+  --gray-600: #5a5956;
+  --gray-900: #1a1a18;
+  --green: #2d6a2d;
+  --green-bg: #eaf3ea;
+  --amber: #8a5a0a;
+  --amber-bg: #fdf3e0;
+  --red: #991f1f;
+  --red-bg: #fdeaea;
+  --blue: #1a4f8a;
+  --blue-bg: #e8f0fb;
+  --purple-bg: #eeebfd;
+  --purple: #3d2daa;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: #1a1a18; display: flex; align-items: center; justify-content: center; font-family: var(--font); }
+
+.device {
+  width: 390px;
+  height: 844px;
+  background: var(--white);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+/* STATUS BAR */
+.statusbar {
+  height: 50px;
+  background: var(--black);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 28px 10px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+.statusbar span { color: var(--white); font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 32px; background: var(--black); border-radius: 0 0 20px 20px; }
+
+/* SCREENS */
+.screens { flex: 1; position: relative; overflow: hidden; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--white); transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); overflow: hidden; }
+.screen.active { transform: translateX(0); }
+.screen.behind { transform: translateX(-30%); }
+
+/* HEADER VARIANTS */
+.hdr-dark { background: var(--black); padding: 18px 22px 20px; flex-shrink: 0; }
+.hdr-light { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 14px 22px; flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+
+.brand-tag { font-size: 11px; font-weight: 500; color: var(--gray-400); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+.brand-tag strong { color: var(--white); }
+.hdr-greeting { font-size: 22px; font-weight: 300; color: var(--white); line-height: 1.25; letter-spacing: -0.02em; }
+.hdr-greeting strong { font-weight: 500; }
+.hdr-sub { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
+
+.back-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--black); padding: 0 4px; font-family: var(--font); line-height: 1; }
+.hdr-title { font-size: 16px; font-weight: 500; color: var(--black); flex: 1; }
+.hdr-action { font-size: 12px; font-weight: 500; color: var(--black); background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 6px 14px; cursor: pointer; white-space: nowrap; font-family: var(--font); }
+.hdr-action-dark { font-size: 12px; font-weight: 500; color: var(--black); background: var(--white); border: none; border-radius: 8px; padding: 7px 16px; cursor: pointer; font-family: var(--font); }
+
+/* KPI STRIP */
+.kpi-strip { background: var(--black); padding: 0 22px 20px; display: flex; gap: 8px; flex-shrink: 0; }
+.kpi { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 10px; cursor: pointer; }
+.kpi-l { font-size: 9px; color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.kpi-v { font-size: 20px; font-weight: 500; color: var(--white); line-height: 1; font-family: var(--mono); }
+.kpi-d { font-size: 10px; margin-top: 4px; }
+.d-up { color: #5dcaa5; }
+.d-dn { color: #f09595; }
+.d-wn { color: #fac775; }
+
+/* SCROLL BODY */
+.scroll-body { flex: 1; overflow-y: auto; background: var(--gray-50); -webkit-overflow-scrolling: touch; }
+.scroll-body::-webkit-scrollbar { display: none; }
+.pad { padding: 16px 18px 100px; }
+
+/* SECTION LABEL */
+.sec-l { font-size: 10px; font-weight: 500; color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; margin: 20px 0 10px; }
+.sec-l:first-child { margin-top: 0; }
+
+/* CARD */
+.card { background: var(--white); border: 1px solid var(--gray-100); border-radius: 16px; overflow: hidden; margin-bottom: 12px; }
+
+/* ROW */
+.row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--gray-100); gap: 12px; cursor: pointer; transition: background 0.12s; }
+.row:last-child { border-bottom: none; }
+.row:active { background: var(--gray-50); }
+.ri { flex: 1; min-width: 0; }
+.rt { font-size: 14px; font-weight: 500; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs { font-size: 11px; color: var(--gray-400); margin-top: 3px; line-height: 1.4; }
+.rr { text-align: right; flex-shrink: 0; }
+.rp { font-size: 14px; font-weight: 500; color: var(--black); font-family: var(--mono); }
+.rc { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+/* BADGES */
+.bdg { font-size: 10px; font-weight: 500; padding: 4px 9px; border-radius: 6px; flex-shrink: 0; white-space: nowrap; }
+.bdg-live { background: var(--green-bg); color: var(--green); }
+.bdg-pend { background: var(--amber-bg); color: var(--amber); }
+.bdg-off  { background: var(--gray-100); color: var(--gray-600); }
+.bdg-new  { background: var(--blue-bg); color: var(--blue); }
+.bdg-done { background: var(--green-bg); color: var(--green); }
+.bdg-bad  { background: var(--red-bg); color: var(--red); }
+.bdg-ship { background: var(--purple-bg); color: var(--purple); }
+.bdg-inv  { background: var(--black); color: var(--white); }
+
+/* THUMB */
+.thumb { width: 46px; height: 46px; border-radius: 10px; background: var(--gray-50); border: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+
+/* FILTER ROW */
+.filter-row { display: flex; gap: 6px; padding: 12px 18px; background: var(--white); border-bottom: 1px solid var(--gray-100); overflow-x: auto; flex-shrink: 0; }
+.filter-row::-webkit-scrollbar { display: none; }
+.fc { font-size: 11px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--gray-100); color: var(--gray-600); background: transparent; cursor: pointer; white-space: nowrap; font-family: var(--font); transition: all 0.12s; }
+.fc.on { background: var(--black); color: var(--white); border-color: var(--black); }
+
+/* SUMMARY GRID */
+.sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.sum-tile { background: var(--white); border: 1px solid var(--gray-100); border-radius: 14px; padding: 14px; }
+.st-l { font-size: 10px; color: var(--gray-400); margin-bottom: 6px; letter-spacing: 0.04em; }
+.st-v { font-size: 22px; font-weight: 500; color: var(--black); font-family: var(--mono); }
+.st-s { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+.st-up { font-size: 11px; color: var(--green); margin-top: 4px; }
+.st-dn { font-size: 11px; color: var(--red); margin-top: 4px; }
+
+/* BAR CHART */
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 0 2px; }
+.bar-g { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar-b { width: 100%; border-radius: 4px 4px 0 0; background: var(--gray-100); min-height: 4px; transition: background 0.2s; }
+.bar-b.hi { background: var(--black); }
+.bar-b.dash { background: transparent; border: 1.5px dashed var(--gray-200); }
+.bar-lbl { font-size: 10px; color: var(--gray-400); }
+
+/* CHART CARD */
+.chart-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: 16px; padding: 18px; margin-bottom: 12px; }
+.cc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.cc-val { font-size: 28px; font-weight: 500; color: var(--black); font-family: var(--mono); letter-spacing: -0.02em; }
+.cc-lbl { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+.cc-period { font-size: 11px; color: var(--gray-600); background: var(--gray-50); border-radius: 6px; padding: 5px 10px; }
+
+/* RATING BAR */
+.rat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.rat-n { font-size: 11px; color: var(--gray-400); width: 8px; text-align: right; }
+.rat-bg { flex: 1; height: 5px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+.rat-fill { height: 100%; background: var(--black); border-radius: 3px; }
+.rat-p { font-size: 11px; color: var(--gray-400); width: 30px; text-align: right; }
+.stars { display: flex; gap: 2px; }
+.sf { color: var(--black); font-size: 13px; }
+.se { color: var(--gray-200); font-size: 13px; }
+
+/* REVIEW BUBBLE */
+.rev-bubble { background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+.rb-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.rb-name { font-size: 13px; font-weight: 500; }
+.rb-date { font-size: 11px; color: var(--gray-400); }
+.rb-body { font-size: 13px; color: var(--black); line-height: 1.6; }
+.rb-prod { font-size: 11px; color: var(--gray-400); margin-top: 6px; }
+
+/* AI TAG */
+.ai-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.ai-tag { font-size: 10px; padding: 3px 9px; border-radius: 5px; }
+.ai-neg { background: var(--red-bg); color: var(--red); }
+.ai-wrn { background: var(--amber-bg); color: var(--amber); }
+.ai-pos { background: var(--blue-bg); color: var(--blue); }
+
+/* REPLY AREA */
+.reply-area { background: var(--white); border: 1px solid var(--gray-100); border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+.ra-lbl { font-size: 10px; font-weight: 500; color: var(--gray-400); padding: 12px 14px 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+.ra-ta { width: 100%; border: none; outline: none; font-family: var(--font); font-size: 13px; color: var(--black); background: transparent; padding: 4px 14px 12px; resize: none; min-height: 70px; line-height: 1.6; }
+.ra-ta::placeholder { color: var(--gray-200); }
+.ra-foot { border-top: 1px solid var(--gray-100); padding: 10px 14px; display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.tpl-btns { display: flex; gap: 6px; overflow-x: auto; }
+.tpl-btns::-webkit-scrollbar { display: none; }
+.tpl-btn { font-size: 11px; padding: 5px 11px; border-radius: 6px; border: 1px solid var(--gray-200); background: transparent; color: var(--gray-600); cursor: pointer; white-space: nowrap; font-family: var(--font); }
+
+/* BUTTONS */
+.btn-primary { background: var(--black); color: var(--white); border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); flex: 1; }
+.btn-outline { background: transparent; color: var(--black); border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px; font-size: 13px; cursor: pointer; font-family: var(--font); flex: 1; }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #f0b0b0; border-radius: 10px; padding: 12px; font-size: 13px; cursor: pointer; font-family: var(--font); flex: 1; }
+.btn-row { display: flex; gap: 8px; padding: 0 0 4px; }
+
+/* STEP TRACK */
+.step-wrap { padding: 14px 16px 10px; }
+.step-track { display: flex; align-items: flex-start; gap: 0; }
+.sn { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+.sc { width: 24px; height: 24px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; color: var(--gray-400); }
+.sc.done { background: var(--black); color: var(--white); }
+.sc.curr { background: var(--black); color: var(--white); box-shadow: 0 0 0 4px rgba(10,10,10,0.1); }
+.sname { font-size: 9px; color: var(--gray-400); white-space: nowrap; }
+.sname.done-t { color: var(--black); font-weight: 500; }
+.sl { flex: 1; height: 1px; background: var(--gray-200); margin-bottom: 14px; }
+.sl.done { background: var(--black); }
+
+/* TIMELINE */
+.timeline { padding: 4px 16px 16px; }
+.tl-row { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0 8px 16px; border-left: 1.5px solid var(--gray-100); margin-left: 5px; position: relative; }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-200); position: absolute; left: -5px; top: 12px; }
+.tl-dot.a { background: var(--black); }
+.tl-t { font-size: 12px; font-weight: 500; color: var(--black); }
+.tl-s { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+/* REASON CHIP */
+.reason { display: inline-flex; font-size: 10px; padding: 3px 9px; border-radius: 5px; background: var(--red-bg); color: var(--red); margin-top: 4px; }
+.reason.blue { background: var(--blue-bg); color: var(--blue); }
+.reason.green { background: var(--green-bg); color: var(--green); }
+
+/* PROMO CARD */
+.promo-c { background: var(--white); border: 1px solid var(--gray-100); border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer; }
+.promo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.promo-title { font-size: 14px; font-weight: 500; color: var(--black); }
+.promo-meta { font-size: 12px; color: var(--gray-400); margin-bottom: 10px; }
+.prog-bg { height: 4px; background: var(--gray-100); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--black); border-radius: 2px; }
+.prog-row { display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; color: var(--gray-400); }
+
+/* ORDER TRACK */
+.ord-track { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+.od { width: 7px; height: 7px; border-radius: 50%; background: var(--gray-200); flex-shrink: 0; }
+.od.d { background: var(--black); }
+.ol { flex: 1; height: 1px; background: var(--gray-200); }
+.ol.d { background: var(--black); }
+
+/* NOTICE CARD */
+.notice-c { background: var(--white); border-radius: 16px; overflow: hidden; margin-bottom: 10px; border: 1px solid var(--gray-100); }
+.notice-bar { padding: 9px 14px; display: flex; align-items: center; gap: 6px; }
+.nb-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.7); flex-shrink: 0; }
+.nb-lbl { font-size: 11px; font-weight: 500; color: var(--white); }
+.nb-time { margin-left: auto; font-size: 10px; color: rgba(255,255,255,0.6); }
+.nb-unread { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.9); flex-shrink: 0; }
+.notice-body { padding: 12px 14px; }
+.notice-title { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 5px; line-height: 1.4; }
+.notice-body-text { font-size: 12px; color: var(--gray-600); line-height: 1.6; }
+.notice-foot { padding: 10px 14px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; background: var(--gray-50); }
+.read-receipt { padding: 8px 14px; background: var(--green-bg); border-top: 1px solid #c0dd97; font-size: 11px; color: var(--green); }
+
+/* SETTLEMENT */
+.settle-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--gray-100); gap: 10px; }
+.settle-row:last-child { border-bottom: none; }
+.sr-info { flex: 1; }
+.sr-t { font-size: 14px; font-weight: 500; color: var(--black); }
+.sr-s { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+.sr-r { text-align: right; }
+.sr-v { font-size: 15px; font-weight: 500; color: var(--black); font-family: var(--mono); }
+.sr-status { font-size: 11px; margin-top: 3px; }
+.income { color: var(--green); }
+.pending { color: var(--amber); }
+
+/* INLINE CHART (settle) */
+.mini-bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 60px; }
+.mb { flex: 1; border-radius: 3px 3px 0 0; background: var(--gray-100); min-height: 3px; }
+.mb.hi { background: var(--black); }
+
+/* PRODUCT RANK */
+.rank-num { font-size: 16px; font-weight: 500; color: var(--gray-200); width: 24px; text-align: center; flex-shrink: 0; }
+
+/* MSG BUBBLES */
+.msg-wrap { flex: 1; overflow-y: auto; padding: 16px; background: var(--gray-50); display: flex; flex-direction: column; gap: 12px; }
+.msg-wrap::-webkit-scrollbar { display: none; }
+.date-div { text-align: center; font-size: 11px; color: var(--gray-400); }
+.mg { display: flex; flex-direction: column; gap: 3px; }
+.mg.me { align-items: flex-end; }
+.mg.them { align-items: flex-start; }
+.sender { font-size: 10px; color: var(--gray-400); padding: 0 4px; }
+.bubble { max-width: 78%; padding: 10px 13px; border-radius: 16px; font-size: 13px; line-height: 1.55; }
+.bubble.me { background: var(--black); color: var(--white); border-bottom-right-radius: 4px; }
+.bubble.them { background: var(--white); color: var(--black); border: 1px solid var(--gray-100); border-bottom-left-radius: 4px; }
+.msg-time { font-size: 10px; color: var(--gray-400); padding: 0 4px; }
+.status-bubble { align-self: center; background: var(--white); border: 1px solid var(--gray-100); border-radius: 20px; padding: 6px 14px; font-size: 11px; color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
+.sdot { width: 6px; height: 6px; border-radius: 50%; }
+.sdot.g { background: var(--green); }
+.sdot.y { background: var(--amber); }
+.file-bubble { max-width: 78%; background: var(--white); border: 1px solid var(--gray-100); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; cursor: pointer; }
+.fi { width: 34px; height: 34px; border-radius: 8px; background: var(--blue-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.fn { font-size: 12px; font-weight: 500; color: var(--black); }
+.fs { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+
+/* QUICK REPLIES */
+.qr-row { padding: 10px 16px 8px; display: flex; gap: 6px; overflow-x: auto; background: var(--white); border-top: 1px solid var(--gray-100); flex-shrink: 0; }
+.qr-row::-webkit-scrollbar { display: none; }
+.qr { font-size: 11px; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--gray-200); color: var(--black); background: transparent; cursor: pointer; white-space: nowrap; font-family: var(--font); }
+
+/* CHAT INPUT */
+.chat-input-bar { padding: 8px 14px 24px; background: var(--white); display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.attach-b { width: 38px; height: 38px; border-radius: 10px; background: var(--gray-50); border: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+.chat-inp { flex: 1; background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 20px; padding: 10px 16px; font-size: 13px; color: var(--black); outline: none; font-family: var(--font); resize: none; min-height: 38px; max-height: 80px; }
+.chat-inp::placeholder { color: var(--gray-200); }
+.send-b { width: 38px; height: 38px; border-radius: 50%; background: var(--black); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: var(--white); font-size: 16px; font-family: var(--font); }
+
+/* CONTEXT BAR */
+.ctx-bar { padding: 8px 16px; background: var(--amber-bg); border-bottom: 1px solid #fac775; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ctx-l { font-size: 11px; font-weight: 500; color: var(--amber); }
+.ctx-t { font-size: 11px; color: var(--amber); }
+
+/* INBOX */
+.thread-item { display: flex; align-items: flex-start; padding: 14px 18px; border-bottom: 1px solid var(--gray-100); cursor: pointer; gap: 12px; transition: background 0.1s; }
+.thread-item:active { background: var(--gray-50); }
+.av { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: var(--gray-50); border: 1px solid var(--gray-100); position: relative; }
+.unread-dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--black); border: 2px solid var(--white); }
+.tb { flex: 1; min-width: 0; }
+.tt { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+.tn { font-size: 14px; font-weight: 500; color: var(--black); }
+.ttime { font-size: 11px; color: var(--gray-400); }
+.tp { font-size: 12px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
+.tp.bold { color: var(--black); font-weight: 500; }
+.tag-row { display: flex; gap: 4px; }
+.ttag { font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+.ttag-ap { background: var(--amber-bg); color: var(--amber); }
+.ttag-ct { background: var(--blue-bg); color: var(--blue); }
+.ttag-inv { background: var(--black); color: var(--white); }
+.ttag-dn { background: var(--gray-100); color: var(--gray-600); }
+
+/* BOTTOM NAV */
+.bnav { background: var(--white); border-top: 1px solid var(--gray-100); display: flex; padding: 10px 0 24px; flex-shrink: 0; position: absolute; bottom: 0; left: 0; right: 0; z-index: 50; }
+.bni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 2px 0; }
+.bni-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.bni-lbl { font-size: 10px; color: var(--gray-400); }
+.bni.on .bni-lbl { color: var(--black); font-weight: 500; }
+svg.nav-icon { width: 22px; height: 22px; fill: none; stroke: var(--gray-400); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.bni.on svg.nav-icon { stroke: var(--black); }
+
+/* RATE BAR */
+.rb-chart { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.rb-chart-lbl { font-size: 12px; color: var(--black); width: 80px; flex-shrink: 0; }
+.rb-chart-bg { flex: 1; height: 5px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+.rb-chart-fill { height: 100%; border-radius: 3px; }
+.rb-chart-pct { font-size: 11px; color: var(--gray-400); width: 30px; text-align: right; }
+
+/* INSIGHT BOX */
+.insight { background: var(--gray-50); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--gray-600); line-height: 1.6; margin-top: 10px; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.screen.active .pad > * { animation: fadeIn 0.25s ease both; }
+.screen.active .pad > *:nth-child(2) { animation-delay: 0.04s; }
+.screen.active .pad > *:nth-child(3) { animation-delay: 0.08s; }
+.screen.active .pad > *:nth-child(4) { animation-delay: 0.12s; }
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="statusbar">
+    <div class="notch"></div>
+    <span>9:41</span>
+    <span>●●●</span>
+  </div>
+
+  <div class="screens">
+
+    <!-- ══════════════════════════════════
+         SCREEN: HOME
+    ══════════════════════════════════ -->
+    <div class="screen active" id="s-home">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center</div>
+        <div class="hdr-greeting">안녕하세요,<br><strong>아크테릭스 코리아</strong>님</div>
+        <div class="hdr-sub">오늘 신규 주문 12건 · Invited D-17</div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi" onclick="nav('s-sales')">
+          <div class="kpi-l">이번달 매출</div>
+          <div class="kpi-v">₩42M</div>
+          <div class="kpi-d d-up">↑ 18.3%</div>
+        </div>
+        <div class="kpi" onclick="nav('s-orders')">
+          <div class="kpi-l">처리 대기</div>
+          <div class="kpi-v">12</div>
+          <div class="kpi-d d-wn">주문 확인</div>
+        </div>
+        <div class="kpi" onclick="nav('s-sales')">
+          <div class="kpi-l">정산 예정</div>
+          <div class="kpi-v">₩8.3M</div>
+          <div class="kpi-d d-up">D-5</div>
+        </div>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="sec-l">빠른 메뉴</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-products')">
+              <div style="font-size:24px;margin-bottom:8px;">📦</div>
+              <div style="font-size:13px;font-weight:500;color:var(--black);">상품 관리</div>
+              <div style="font-size:11px;color:var(--gray-400);margin-top:2px;">등록 4종</div>
+            </div>
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-orders')">
+              <div style="font-size:24px;margin-bottom:8px;">🚚</div>
+              <div style="font-size:13px;font-weight:500;color:var(--black);">주문·배송</div>
+              <div style="font-size:11px;color:var(--gray-400);margin-top:2px;">대기 12건</div>
+            </div>
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-review')">
+              <div style="font-size:24px;margin-bottom:8px;">⭐</div>
+              <div style="font-size:13px;font-weight:500;color:var(--black);">리뷰·CS</div>
+              <div style="font-size:11px;color:var(--red);margin-top:2px;">미답변 5건</div>
+            </div>
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-returns')">
+              <div style="font-size:24px;margin-bottom:8px;">↩️</div>
+              <div style="font-size:13px;font-weight:500;color:var(--black);">반품·교환</div>
+              <div style="font-size:11px;color:var(--amber);margin-top:2px;">처리 대기 4건</div>
+            </div>
+          </div>
+
+          <div class="sec-l">공지 수신함</div>
+          <div class="notice-c">
+            <div class="notice-bar" style="background:#dc3030;">
+              <div class="nb-unread"></div>
+              <div class="nb-lbl">긴급 공지 — M몰 MD팀</div>
+              <div class="nb-time">오늘 08:02</div>
+            </div>
+            <div class="notice-body">
+              <div class="notice-title">M몰 결제 시스템 점검 — 오늘 23:00–01:00</div>
+              <div class="notice-body-text">금일 23시부터 2시간 점검이 진행됩니다. 주문 접수 및 정산 처리가 일시 중단됩니다.</div>
+            </div>
+            <div class="notice-foot">
+              <button class="btn-primary" id="notice-confirm" onclick="confirmNotice()">확인했습니다</button>
+            </div>
+          </div>
+
+          <div class="sec-l">재고 알림</div>
+          <div class="card">
+            <div class="row">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+              <div class="ri"><div class="rt">베타 AR 재킷 M 사이즈</div><div class="rs">잔여 재고 2개 — 즉시 보충 필요</div></div>
+              <div class="bdg bdg-bad">긴급</div>
+            </div>
+            <div class="row">
+              <div style="width:8px;height:8px;border-radius:50%;background:#ba7517;flex-shrink:0;"></div>
+              <div class="ri"><div class="rt">노반 SL 265mm</div><div class="rs">잔여 재고 5개 — 보충 권장</div></div>
+              <div class="bdg bdg-pend">주의</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni on" onclick="nav('s-home')">
+          <div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div class="bni-lbl">홈</div>
+        </div>
+        <div class="bni" onclick="nav('s-orders')">
+          <div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="bni-lbl">주문</div>
+        </div>
+        <div class="bni" onclick="nav('s-sales')">
+          <div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div class="bni-lbl">매출·정산</div>
+        </div>
+        <div class="bni" onclick="nav('s-messages')">
+          <div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="bni-lbl">메시지</div>
+        </div>
+        <div class="bni" onclick="nav('s-products')">
+          <div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+          <div class="bni-lbl">상품</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN: PRODUCTS
+    ══════════════════════════════════ -->
+    <div class="screen" id="s-products">
+      <div class="hdr-dark">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div class="brand-tag"><strong>M</strong> Seller Center</div>
+          <button class="hdr-action-dark" onclick="alert('상품 등록 플로우')">+ 상품 등록</button>
+        </div>
+        <div class="hdr-greeting"><strong>상품 관리</strong></div>
+        <div class="hdr-sub">등록 4종 · 판매중 3 · 검수 1</div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">판매중</button>
+        <button class="fc">검수중</button>
+        <button class="fc">판매중지</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="card">
+            <div class="row">
+              <div class="thumb">🧥</div>
+              <div class="ri"><div class="rt">베타 AR 재킷 — 블랙</div><div class="rs">SKU: ARC-BETA-BLK · 재고 12</div></div>
+              <div><div class="bdg bdg-live" style="margin-bottom:4px;">판매중</div><div class="rp">₩798,000</div></div>
+            </div>
+            <div class="row">
+              <div class="thumb">👟</div>
+              <div class="ri"><div class="rt">노반 SL 트레일화</div><div class="rs">SKU: ARC-NORVAN-SL · 재고 5</div></div>
+              <div><div class="bdg bdg-live" style="margin-bottom:4px;">판매중</div><div class="rp">₩238,000</div></div>
+            </div>
+            <div class="row">
+              <div class="thumb">🎒</div>
+              <div class="ri"><div class="rt">아로하 백팩 그레이</div><div class="rs">SKU: ARC-ARRO-22 · 검수 중</div></div>
+              <div><div class="bdg bdg-pend" style="margin-bottom:4px;">검수중</div><div class="rp">₩178,000</div></div>
+            </div>
+            <div class="row">
+              <div class="thumb">🧣</div>
+              <div class="ri"><div class="rt">울 터틀넥 네이비</div><div class="rs">SKU: ARC-WOOL-NVY · 재고 0</div></div>
+              <div><div class="bdg bdg-off" style="margin-bottom:4px;">판매중지</div><div class="rp">₩128,000</div></div>
+            </div>
+          </div>
+          <div class="sec-l">프로모션</div>
+          <div class="promo-c">
+            <div class="promo-head"><div class="promo-title">Invited 런칭 스페셜</div><div class="bdg bdg-live">진행중</div></div>
+            <div class="promo-meta">4/8 오픈 기념 · 전 품목 10% 할인 · ~4/14</div>
+            <div class="prog-bg"><div class="prog-fill" style="width:30%;"></div></div>
+            <div class="prog-row"><span>참여 312명</span><span>목표 1,000명</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-orders')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="bni-lbl">주문</div></div>
+        <div class="bni" onclick="nav('s-sales')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">매출·정산</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni on" onclick="nav('s-products')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="bni-lbl">상품</div></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN: ORDERS
+    ══════════════════════════════════ -->
+    <div class="screen" id="s-orders">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center</div>
+        <div class="hdr-greeting"><strong>주문 · 배송</strong></div>
+        <div class="hdr-sub">오늘 신규 12건 · 배송중 34건</div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi"><div class="kpi-l">신규 주문</div><div class="kpi-v">12</div><div class="kpi-d d-wn">확인 대기</div></div>
+        <div class="kpi"><div class="kpi-l">발송 완료</div><div class="kpi-v">8</div><div class="kpi-d d-up">오늘</div></div>
+        <div class="kpi"><div class="kpi-l">반품 접수</div><div class="kpi-v">2</div><div class="kpi-d d-dn">처리 필요</div></div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">결제완료</button>
+        <button class="fc">배송중</button>
+        <button class="fc">배송완료</button>
+        <button class="fc">반품</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="card">
+            <div class="row">
+              <div class="ri">
+                <div class="rt">주문 #20260322-0847</div>
+                <div class="rs">베타 AR 재킷 블랙 M · 오늘 09:14</div>
+                <div class="ord-track"><div class="od d"></div><div class="ol d"></div><div class="od d"></div><div class="ol"></div><div class="od"></div><div class="ol"></div><div class="od"></div></div>
+              </div>
+              <div class="bdg bdg-new">결제완료</div>
+            </div>
+            <div class="row">
+              <div class="ri">
+                <div class="rt">주문 #20260321-1203</div>
+                <div class="rs">노반 SL 트레일화 265 · 어제 14:33</div>
+                <div class="ord-track"><div class="od d"></div><div class="ol d"></div><div class="od d"></div><div class="ol d"></div><div class="od d"></div><div class="ol"></div><div class="od"></div></div>
+              </div>
+              <div class="bdg bdg-ship">배송중</div>
+            </div>
+            <div class="row">
+              <div class="ri">
+                <div class="rt">주문 #20260320-0521</div>
+                <div class="rs">아로하 백팩 그레이 · 3/20</div>
+                <div class="ord-track"><div class="od d"></div><div class="ol d"></div><div class="od d"></div><div class="ol d"></div><div class="od d"></div><div class="ol d"></div><div class="od d"></div></div>
+              </div>
+              <div class="bdg bdg-done">배송완료</div>
+            </div>
+          </div>
+          <div class="sec-l">반품 처리 필요</div>
+          <div class="card">
+            <div class="row" onclick="nav('s-returns')">
+              <div class="ri"><div class="rt">베타 AR 재킷 블랙 L</div><div class="rs">#20260320-0412 · 사이즈 불만<br>환불 예정 ₩798,000</div></div>
+              <div class="bdg bdg-bad">수거 대기</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni on" onclick="nav('s-orders')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="bni-lbl">주문</div></div>
+        <div class="bni" onclick="nav('s-sales')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">매출·정산</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-products')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="bni-lbl">상품</div></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN: SALES & SETTLEMENT
+    ══════════════════════════════════ -->
+    <div class="screen" id="s-sales">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center</div>
+        <div class="hdr-greeting"><strong>매출 · 정산</strong></div>
+        <div class="hdr-sub">3월 누적 · 다음 정산 D-5</div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">이번 달</button>
+        <button class="fc">지난 달</button>
+        <button class="fc">3개월</button>
+        <button class="fc">6개월</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="chart-card">
+            <div class="cc-head">
+              <div><div class="cc-val">₩42,180,000</div><div class="cc-lbl">3월 누적 매출</div></div>
+              <div class="cc-period">2026.03</div>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-g"><div class="bar-b" style="height:42%;"></div><div class="bar-lbl">1주</div></div>
+              <div class="bar-g"><div class="bar-b" style="height:60%;"></div><div class="bar-lbl">2주</div></div>
+              <div class="bar-g"><div class="bar-b hi" style="height:80%;"></div><div class="bar-lbl">3주</div></div>
+              <div class="bar-g"><div class="bar-b dash" style="height:28%;"></div><div class="bar-lbl">4주</div></div>
+            </div>
+          </div>
+
+          <div class="sum-grid">
+            <div class="sum-tile"><div class="st-l">총 주문 건수</div><div class="st-v">184</div><div class="st-up">↑ 22%</div></div>
+            <div class="sum-tile"><div class="st-l">평균 객단가</div><div class="st-v">₩229K</div><div class="st-up">↑ 8.7%</div></div>
+            <div class="sum-tile"><div class="st-l">반품율</div><div class="st-v">2.3%</div><div class="st-dn">↑ 0.4%p</div></div>
+            <div class="sum-tile"><div class="st-l">재구매율</div><div class="st-v">18%</div><div class="st-up">↑ 3%p</div></div>
+          </div>
+
+          <div class="sec-l">상품별 매출 TOP 3</div>
+          <div class="card">
+            <div class="row">
+              <div class="rank-num">1</div>
+              <div class="ri"><div class="rt">베타 AR 재킷</div><div class="rs">18건 판매</div></div>
+              <div class="rr"><div class="rp">₩14,364K</div><div class="rc" style="color:var(--green);">↑ 22%</div></div>
+            </div>
+            <div class="row">
+              <div class="rank-num">2</div>
+              <div class="ri"><div class="rt">노반 SL 트레일화</div><div class="rs">31건 판매</div></div>
+              <div class="rr"><div class="rp">₩7,378K</div><div class="rc" style="color:var(--green);">↑ 9%</div></div>
+            </div>
+            <div class="row">
+              <div class="rank-num">3</div>
+              <div class="ri"><div class="rt">아로하 백팩</div><div class="rs">24건 판매</div></div>
+              <div class="rr"><div class="rp">₩4,272K</div><div class="rc" style="color:var(--red);">↓ 3%</div></div>
+            </div>
+          </div>
+
+          <div class="sec-l">정산 내역</div>
+          <div class="card">
+            <div class="settle-row">
+              <div class="sr-info"><div class="sr-t">3월 2차 정산</div><div class="sr-s">3/16–3/22 · 38건</div></div>
+              <div class="sr-r"><div class="sr-v">₩8,340,000</div><div class="sr-status pending">D-5 입금 예정</div></div>
+            </div>
+            <div class="settle-row">
+              <div class="sr-info"><div class="sr-t">3월 1차 정산</div><div class="sr-s">3/1–3/15 · 52건</div></div>
+              <div class="sr-r"><div class="sr-v">₩18,290,000</div><div class="sr-status income">입금 완료</div></div>
+            </div>
+            <div class="settle-row">
+              <div class="sr-info"><div class="sr-t">2월 정산</div><div class="sr-s">2/1–2/28 · 91건</div></div>
+              <div class="sr-r"><div class="sr-v">₩33,440,000</div><div class="sr-status income">입금 완료</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-orders')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="bni-lbl">주문</div></div>
+        <div class="bni on" onclick="nav('s-sales')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">매출·정산</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-products')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="bni-lbl">상품</div></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN: REVIEW & CS
+    ══════════════════════════════════ -->
+    <div class="screen" id="s-review">
+      <div class="hdr-dark">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div class="brand-tag"><strong>M</strong> Seller Center</div>
+            <div class="hdr-greeting"><strong>리뷰 · CS</strong></div>
+            <div class="hdr-sub">평점 4.6 · 미답변 5건</div>
+          </div>
+          <div class="bdg bdg-bad" style="margin-top:6px;font-size:11px;padding:5px 12px;">미답변 5</div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">미답변</button>
+        <button class="fc">별점1·2</button>
+        <button class="fc">CS 문의</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="card" style="padding:14px;">
+            <div style="display:flex;gap:14px;align-items:center;">
+              <div style="text-align:center;flex-shrink:0;">
+                <div style="font-size:38px;font-weight:500;font-family:var(--mono);line-height:1;">4.6</div>
+                <div class="stars" style="justify-content:center;margin:5px 0;">
+                  <span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">★</span>
+                </div>
+                <div style="font-size:11px;color:var(--gray-400);">184개</div>
+              </div>
+              <div style="flex:1;">
+                <div class="rat-row"><div class="rat-n">5</div><div class="rat-bg"><div class="rat-fill" style="width:72%;"></div></div><div class="rat-p">72%</div></div>
+                <div class="rat-row"><div class="rat-n">4</div><div class="rat-bg"><div class="rat-fill" style="width:18%;"></div></div><div class="rat-p">18%</div></div>
+                <div class="rat-row"><div class="rat-n">3</div><div class="rat-bg"><div class="rat-fill" style="width:6%;"></div></div><div class="rat-p">6%</div></div>
+                <div class="rat-row"><div class="rat-n">2</div><div class="rat-bg"><div class="rat-fill" style="width:2%;"></div></div><div class="rat-p">2%</div></div>
+                <div class="rat-row"><div class="rat-n">1</div><div class="rat-bg"><div class="rat-fill" style="width:2%;"></div></div><div class="rat-p">2%</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sec-l">미답변 — 우선 처리</div>
+          <div class="card">
+            <div class="row" onclick="nav('s-review-detail')">
+              <div class="ri">
+                <div class="stars"><span class="se">★</span><span class="se">★</span><span class="se">★</span><span class="se">★</span><span class="se">★</span></div>
+                <div class="rt" style="margin-top:3px;">사이즈가 표기보다 작게 느껴져요</div>
+                <div class="rs">베타 AR 재킷 블랙 M · 김○○ · 오늘 08:14</div>
+              </div>
+              <div class="bdg bdg-bad">별점1</div>
+            </div>
+            <div class="row" onclick="nav('s-review-detail')">
+              <div class="ri">
+                <div class="stars"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">★</span><span class="se">★</span></div>
+                <div class="rt" style="margin-top:3px;">배송이 예상보다 늦었습니다</div>
+                <div class="rs">노반 SL 트레일화 265 · 이○○ · 어제</div>
+              </div>
+              <div class="bdg bdg-new">미답변</div>
+            </div>
+          </div>
+
+          <div class="sec-l">CS 문의</div>
+          <div class="card">
+            <div class="row" onclick="nav('s-review-detail')">
+              <div class="ri"><div class="rt">교환 가능한가요? (색상 변경)</div><div class="rs">베타 AR 재킷 블랙 → 딥 크림 · 오늘 10:22</div></div>
+              <div class="bdg bdg-bad">긴급</div>
+            </div>
+            <div class="row">
+              <div class="ri"><div class="rt">M포인트 적립이 안 됐어요</div><div class="rs">주문 #20260321-1203 · 어제 16:44</div></div>
+              <div class="bdg bdg-pend">처리중</div>
+            </div>
+          </div>
+
+          <div class="sec-l">답변 완료</div>
+          <div class="card">
+            <div class="row">
+              <div class="ri">
+                <div class="stars"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+                <div class="rt" style="margin-top:3px;">역시 아크테릭스, 완벽합니다</div>
+                <div class="rs">베타 FL 재킷 · 3/19</div>
+              </div>
+              <div class="bdg bdg-done">답변완료</div>
+            </div>
+            <div style="margin:0 14px 12px;padding:10px 12px;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-100);">
+              <div style="font-size:10px;color:var(--gray-400);font-weight:500;margin-bottom:4px;letter-spacing:0.05em;text-transform:uppercase;">브랜드 답변</div>
+              <div style="font-size:12px;color:var(--black);line-height:1.5;">소중한 리뷰 감사드립니다. 만족스러운 구매 경험이 되셨다니 기쁩니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-orders')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="bni-lbl">주문</div></div>
+        <div class="bni" onclick="nav('s-sales')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">매출·정산</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-products')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="bni-lbl">상품</div></div>
+      </div>
+    </div>
+
+    <!-- REVIEW DETAIL -->
+    <div class="screen" id="s-review-detail">
+      <div class="hdr-light">
+        <button class="back-btn" onclick="nav('s-review')">‹</button>
+        <div class="hdr-title">리뷰 답변</div>
+        <div class="bdg bdg-bad">별점 1</div>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="rev-bubble">
+            <div class="rb-top">
+              <div><div class="stars"><span class="se">★</span><span class="se">★</span><span class="se">★</span><span class="se">★</span><span class="se">★</span></div><div class="rb-name" style="margin-top:5px;">김○○</div></div>
+              <div class="rb-date">오늘 08:14</div>
+            </div>
+            <div class="rb-body">사이즈가 표기보다 작게 느껴져요. L을 샀는데 M처럼 끼네요. 구매 전에 알았으면 좋았겠어요.</div>
+            <div class="rb-prod">베타 AR 재킷 블랙 L · 주문 #20260320-0412</div>
+          </div>
+          <div class="card" style="padding:12px 14px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:500;color:var(--gray-400);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">AI 감성 분석</div>
+            <div class="ai-tags">
+              <span class="ai-tag ai-neg">사이즈 불만</span>
+              <span class="ai-tag ai-wrn">정보 부족</span>
+              <span class="ai-tag ai-pos">재구매 의향 있음</span>
+            </div>
+            <div class="insight">사이즈 가이드 안내가 핵심입니다. 공감 + 정보 제공 답변이 효과적입니다.</div>
+          </div>
+          <div class="reply-area">
+            <div class="ra-lbl">브랜드 답변 작성</div>
+            <textarea class="ra-ta" id="replyTa" placeholder="리뷰에 답변을 작성하세요..."></textarea>
+            <div class="ra-foot">
+              <div class="tpl-btns">
+                <button class="tpl-btn" onclick="fillTpl('size')">사이즈 안내</button>
+                <button class="tpl-btn" onclick="fillTpl('sorry')">불편 사과</button>
+                <button class="tpl-btn" onclick="fillTpl('thanks')">감사 인사</button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-outline" onclick="nav('s-review')">취소</button>
+            <button class="btn-primary" onclick="submitReply()">답변 등록</button>
+          </div>
+          <div class="card" style="padding:12px 14px;margin-top:10px;">
+            <div style="font-size:10px;font-weight:500;color:var(--gray-400);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">같은 상품 리뷰 패턴</div>
+            <div style="font-size:12px;color:var(--gray-600);line-height:1.6;">베타 AR 재킷 리뷰 62건 중 <strong style="color:var(--black);">11건(18%)</strong>에서 '사이즈'가 언급됩니다.</div>
+            <button style="margin-top:8px;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;">→ 상품 수정하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN: RETURNS
+    ══════════════════════════════════ -->
+    <div class="screen" id="s-returns">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center</div>
+        <div class="hdr-greeting"><strong>반품 · 교환</strong></div>
+        <div class="hdr-sub">처리 대기 4건 · 반품율 2.3%</div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi"><div class="kpi-l">이번달 반품</div><div class="kpi-v">7</div><div class="kpi-d d-dn">↑ 2건</div></div>
+        <div class="kpi"><div class="kpi-l">반품율</div><div class="kpi-v">2.3%</div><div class="kpi-d d-wn">업계 3.1%</div></div>
+        <div class="kpi"><div class="kpi-l">처리 대기</div><div class="kpi-v">4</div><div class="kpi-d d-wn">확인 필요</div></div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">수거 대기</button>
+        <button class="fc">검수 중</button>
+        <button class="fc">완료</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="sec-l">처리 대기</div>
+          <div class="card">
+            <div class="row" onclick="nav('s-return-detail')">
+              <div class="ri">
+                <div class="rt">베타 AR 재킷 블랙 L</div>
+                <div class="rs">주문 #20260320-0412 · 오늘 09:31 접수</div>
+                <span class="reason">사이즈 불만</span>
+              </div>
+              <div style="text-align:right;"><div class="bdg bdg-bad" style="margin-bottom:4px;">수거 대기</div><div style="font-size:11px;color:var(--gray-400);">₩798,000</div></div>
+            </div>
+            <div class="row" onclick="nav('s-return-detail')">
+              <div class="ri">
+                <div class="rt">노반 SL 트레일화 265mm</div>
+                <div class="rs">주문 #20260319-0882 · 어제 15:20 접수</div>
+                <span class="reason">단순 변심</span>
+              </div>
+              <div style="text-align:right;"><div class="bdg bdg-pend" style="margin-bottom:4px;">수거 완료</div><div style="font-size:11px;color:var(--gray-400);">₩238,000</div></div>
+            </div>
+            <div class="row" onclick="nav('s-return-detail')">
+              <div class="ri">
+                <div class="rt">베타 AR 재킷 블랙 M → 딥 크림 M</div>
+                <div class="rs">교환 요청 · 3/18</div>
+                <span class="reason blue">색상 교환</span>
+              </div>
+              <div style="text-align:right;"><div class="bdg bdg-ship" style="margin-bottom:4px;">교환 진행</div><div style="font-size:11px;color:var(--gray-400);">₩798,000</div></div>
+            </div>
+          </div>
+
+          <div class="sec-l">반품 사유 분석</div>
+          <div class="card" style="padding:14px;">
+            <div class="rb-chart"><div class="rb-chart-lbl">사이즈 불만</div><div class="rb-chart-bg"><div class="rb-chart-fill" style="width:43%;background:var(--black);"></div></div><div class="rb-chart-pct">43%</div></div>
+            <div class="rb-chart"><div class="rb-chart-lbl">단순 변심</div><div class="rb-chart-bg"><div class="rb-chart-fill" style="width:29%;background:var(--black);"></div></div><div class="rb-chart-pct">29%</div></div>
+            <div class="rb-chart"><div class="rb-chart-lbl">상품 불량</div><div class="rb-chart-bg"><div class="rb-chart-fill" style="width:14%;background:var(--red);"></div></div><div class="rb-chart-pct">14%</div></div>
+            <div class="rb-chart"><div class="rb-chart-lbl">색상 교환</div><div class="rb-chart-bg"><div class="rb-chart-fill" style="width:14%;background:var(--gray-400);"></div></div><div class="rb-chart-pct">14%</div></div>
+            <div class="insight">사이즈 불만 43%로 1위. 상품 상세에 핏 가이드 추가를 권장합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-orders')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="bni-lbl">주문</div></div>
+        <div class="bni" onclick="nav('s-sales')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">매출·정산</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-products')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="bni-lbl">상품</div></div>
+      </div>
+    </div>
+
+    <!-- RETURN DETAIL -->
+    <div class="screen" id="s-return-detail">
+      <div class="hdr-light">
+        <button class="back-btn" onclick="nav('s-returns')">‹</button>
+        <div class="hdr-title">반품 상세</div>
+        <div class="bdg bdg-bad" id="return-badge">수거 대기</div>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="card" style="padding-top:14px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:500;color:var(--gray-400);letter-spacing:0.06em;text-transform:uppercase;padding:0 14px 10px;">처리 단계</div>
+            <div class="step-wrap">
+              <div class="step-track">
+                <div class="sn"><div class="sc done" id="step1">✓</div><div class="sname done-t">접수</div></div>
+                <div class="sl done" id="line1"></div>
+                <div class="sn"><div class="sc curr" id="step2">2</div><div class="sname done-t">수거</div></div>
+                <div class="sl" id="line2"></div>
+                <div class="sn"><div class="sc" id="step3">3</div><div class="sname">검수</div></div>
+                <div class="sl" id="line3"></div>
+                <div class="sn"><div class="sc" id="step4">4</div><div class="sname">환불</div></div>
+                <div class="sl" id="line4"></div>
+                <div class="sn"><div class="sc" id="step5">5</div><div class="sname">완료</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:14px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:500;color:var(--gray-400);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">반품 정보</div>
+            <table style="width:100%;font-size:13px;border-collapse:collapse;">
+              <tr><td style="color:var(--gray-400);padding:4px 0;width:80px;">상품</td><td style="font-weight:500;">베타 AR 재킷 블랙 L</td></tr>
+              <tr><td style="color:var(--gray-400);padding:4px 0;">주문번호</td><td>#20260320-0412</td></tr>
+              <tr><td style="color:var(--gray-400);padding:4px 0;">접수일시</td><td>오늘 09:31</td></tr>
+              <tr><td style="color:var(--gray-400);padding:4px 0;">반품 사유</td><td><span class="reason" style="margin:0;">사이즈 불만</span></td></tr>
+              <tr><td style="color:var(--gray-400);padding:4px 0 8px;">환불 예정</td><td style="font-size:15px;font-weight:500;font-family:var(--mono);">₩798,000</td></tr>
+            </table>
+          </div>
+          <div class="card" style="padding:14px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:500;color:var(--gray-400);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">수거 처리</div>
+            <div style="font-size:12px;color:var(--gray-600);background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+              <span style="color:var(--gray-400);">운송장</span>&nbsp; 631-8842-7120<br>
+              <span style="color:var(--gray-400);">수거 예정</span>&nbsp; 오늘 오후 2–6시
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" onclick="nextStep()">수거 완료 처리</button>
+              <button class="btn-outline">수거 재예약</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:10px;font-weight:500;color:var(--gray-400);letter-spacing:0.06em;text-transform:uppercase;padding:14px 14px 8px;">처리 이력</div>
+            <div class="timeline">
+              <div class="tl-row"><div class="tl-dot a"></div><div><div class="tl-t">반품 접수 완료</div><div class="tl-s">오늘 09:31 · 고객 앱</div></div></div>
+              <div class="tl-row"><div class="tl-dot a"></div><div><div class="tl-t">CJ 대한통운 수거 예약</div><div class="tl-s">오늘 09:45 · 자동 예약</div></div></div>
+              <div class="tl-row" style="border-left-color:transparent;"><div class="tl-dot"></div><div><div class="tl-t" style="color:var(--gray-400);">수거 완료 대기 중</div><div class="tl-s">오늘 오후 2–6시 예정</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN: MESSAGES
+    ══════════════════════════════════ -->
+    <div class="screen" id="s-messages">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center</div>
+        <div class="hdr-greeting"><strong>메시지</strong></div>
+        <div class="hdr-sub">MD팀과의 커뮤니케이션</div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">미확인</button>
+        <button class="fc">승인 대기</button>
+        <button class="fc">Invited</button>
+      </div>
+      <div class="scroll-body" style="background:var(--white);">
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">👩‍💼<div class="unread-dot"></div></div>
+          <div class="tb">
+            <div class="tt"><div class="tn">김지수 MD</div><div class="ttime">방금</div></div>
+            <div class="tp bold">이미지 검토 완료했습니다. 스쿼미쉬 후드 1장 재업로드 필요해요.</div>
+            <div class="tag-row"><span class="ttag ttag-ap">승인 대기</span><span class="ttag ttag-inv">Invited</span></div>
+          </div>
+        </div>
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">📢</div>
+          <div class="tb">
+            <div class="tt"><div class="tn">M몰 공지</div><div class="ttime">오늘 08:02</div></div>
+            <div class="tp bold">결제 시스템 점검 안내 — 오늘 23:00–01:00</div>
+            <div class="tag-row"><span class="ttag ttag-ap">긴급</span></div>
+          </div>
+        </div>
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">👨‍💼</div>
+          <div class="tb">
+            <div class="tt"><div class="tn">이준혁 MD</div><div class="ttime">어제</div></div>
+            <div class="tp">4월 기획전 참여 여부 확인 부탁드립니다.</div>
+            <div class="tag-row"><span class="ttag ttag-dn">완료</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-orders')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="bni-lbl">주문</div></div>
+        <div class="bni" onclick="nav('s-sales')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">매출·정산</div></div>
+        <div class="bni on" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-products')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="bni-lbl">상품</div></div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="screen" id="s-chat" style="background:var(--white);">
+      <div class="hdr-light">
+        <button class="back-btn" onclick="nav('s-messages')">‹</button>
+        <div style="width:34px;height:34px;border-radius:9px;background:var(--gray-50);border:1px solid var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">👩‍💼</div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:500;">김지수 MD</div><div style="font-size:11px;color:var(--gray-400);">Invited 담당 MD</div></div>
+      </div>
+      <div class="ctx-bar">
+        <div class="ctx-l">승인 대기</div>
+        <div style="width:1px;height:12px;background:#fac775;"></div>
+        <div class="ctx-t">베타 FL 재킷 외 2종 — 상품 등록 검토 중</div>
+      </div>
+      <div class="msg-wrap" id="msgWrap">
+        <div class="date-div">3월 21일 금요일</div>
+        <div class="mg them"><div class="sender">김지수 MD</div><div class="bubble them">Invited 섹션 런칭 관련해서 신규 상품 3종 등록 요청드립니다.</div><div class="msg-time">오후 2:14</div></div>
+        <div class="mg them"><div class="file-bubble"><div class="fi">📄</div><div><div class="fn">상품_등록_요청서_ARC_0321.pdf</div><div class="fs">PDF · 2.3 MB</div></div></div><div class="msg-time">오후 2:15</div></div>
+        <div class="mg me"><div class="bubble me">확인했습니다. 이미지 사양 검토 후 오늘 내로 피드백 드리겠습니다.</div><div class="msg-time">오후 3:02</div></div>
+        <div class="status-bubble"><div class="sdot y"></div><span>이미지 사양 검토 중</span></div>
+        <div class="date-div">오늘 · 3월 22일</div>
+        <div class="mg them"><div class="sender">김지수 MD</div><div class="bubble them">이미지 검토 완료했습니다. 베타 FL·감마 SL은 통과인데요, 스쿼미쉬 후드 1장이 해상도 기준 미달이에요. 재업로드 필요합니다.</div><div class="msg-time">오전 9:18</div></div>
+        <div class="status-bubble"><div class="sdot g"></div><span>이미지 재업로드 완료 · 승인 대기</span></div>
+      </div>
+      <div class="qr-row">
+        <button class="qr" onclick="addMsg('네, 바로 재업로드하겠습니다.')">재업로드 진행</button>
+        <button class="qr" onclick="addMsg('확인했습니다. 감사합니다.')">확인</button>
+        <button class="qr" onclick="addMsg('추가 문의사항이 있습니다.')">문의</button>
+      </div>
+      <div class="chat-input-bar">
+        <div class="attach-b">+</div>
+        <textarea class="chat-inp" id="chatInp" placeholder="메시지 입력..." rows="1"></textarea>
+        <button class="send-b" onclick="sendMsg()">↑</button>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+</div><!-- /device -->
+
+<script>
+let history = [];
+function nav(id) {
+  const all = document.querySelectorAll('.screen');
+  const current = document.querySelector('.screen.active');
+  if (current && current.id === id) return;
+  if (current) { history.push(current.id); current.classList.remove('active'); current.classList.add('behind'); setTimeout(() => current.classList.remove('behind'), 350); }
+  const target = document.getElementById(id);
+  if (target) { target.classList.add('active'); target.querySelector('.scroll-body')?.scrollTo(0,0); }
+}
+
+function confirmNotice() {
+  const btn = document.getElementById('notice-confirm');
+  btn.textContent = '✓ 확인 완료';
+  btn.style.background = '#2d6a2d';
+}
+
+const tpls = {
+  size: '안녕하세요. 사이즈 관련 불편을 드려 진심으로 사과드립니다.\n\n아크테릭스 제품은 유럽 핏 기준으로 국내 사이즈 대비 약 0.5–1 사이즈 작게 느껴지실 수 있습니다. 다음 구매 시 사이즈 가이드를 참고해 주세요.',
+  sorry: '안녕하세요. 불편을 드려 정말 죄송합니다. 더 좋은 서비스로 보답하겠습니다.',
+  thanks: '소중한 리뷰 감사드립니다. 앞으로도 최고의 제품으로 보답하겠습니다.'
+};
+function fillTpl(k) { document.getElementById('replyTa').value = tpls[k]; }
+function submitReply() { const v = document.getElementById('replyTa').value.trim(); if (!v) return; nav('s-review'); }
+
+let stepCount = 2;
+function nextStep() {
+  if (stepCount >= 5) return;
+  document.getElementById('step'+stepCount).classList.remove('curr');
+  document.getElementById('step'+stepCount).classList.add('done');
+  document.getElementById('step'+stepCount).textContent = '✓';
+  document.getElementById('line'+stepCount).classList.add('done');
+  stepCount++;
+  if (stepCount <= 5) {
+    document.getElementById('step'+stepCount).classList.add('curr');
+    const labels = ['','접수','수거','검수','환불','완료'];
+    document.getElementById('return-badge').textContent = labels[stepCount];
+  }
+}
+
+function addMsg(text) {
+  const w = document.getElementById('msgWrap');
+  const g = document.createElement('div'); g.className = 'mg me';
+  g.innerHTML = '<div class="bubble me">'+text+'</div><div class="msg-time">방금</div>';
+  w.appendChild(g); w.scrollTop = w.scrollHeight;
+}
+function sendMsg() {
+  const inp = document.getElementById('chatInp'); const v = inp.value.trim();
+  if (!v) return; addMsg(v); inp.value = '';
+}
+document.getElementById('chatInp').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
+
+document.querySelectorAll('.filter-row').forEach(row => {
+  row.querySelectorAll('.fc').forEach(btn => {
+    btn.addEventListener('click', function() { row.querySelectorAll('.fc').forEach(b => b.classList.remove('on')); this.classList.add('on'); });
+  });
+});
+</script>
+</body>
+</html>

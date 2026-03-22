@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>M Seller Center — MD Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --gray-50: #f5f4f1;
+  --gray-100: #e8e7e3;
+  --gray-200: #c8c7c2;
+  --gray-400: #888780;
+  --gray-600: #5a5956;
+  --gray-900: #1a1a18;
+  --green: #2d6a2d; --green-bg: #eaf3ea;
+  --amber: #8a5a0a; --amber-bg: #fdf3e0;
+  --red: #991f1f; --red-bg: #fdeaea;
+  --blue: #1a4f8a; --blue-bg: #e8f0fb;
+  --purple-bg: #eeebfd; --purple: #3d2daa;
+  --teal: #0f6e56; --teal-bg: #e1f5ee;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: #0f0e0c; display: flex; align-items: center; justify-content: center; font-family: var(--font); }
+
+.device { width: 390px; height: 844px; background: var(--white); border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04); display: flex; flex-direction: column; }
+.statusbar { height: 50px; background: var(--black); display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; flex-shrink: 0; position: relative; z-index: 100; }
+.statusbar span { color: var(--white); font-size: 12px; font-weight: 500; }
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 32px; background: var(--black); border-radius: 0 0 20px 20px; }
+
+.screens { flex: 1; position: relative; overflow: hidden; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--white); transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); overflow: hidden; }
+.screen.active { transform: translateX(0); }
+.screen.behind { transform: translateX(-30%); }
+
+/* MD ROLE BADGE */
+.md-role { font-size: 10px; background: var(--amber); color: var(--amber-bg); border-radius: 5px; padding: 3px 9px; font-weight: 500; letter-spacing: 0.06em; }
+
+.hdr-dark { background: var(--black); padding: 18px 22px 20px; flex-shrink: 0; }
+.hdr-light { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 14px 22px; flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+.brand-tag { font-size: 11px; font-weight: 500; color: var(--gray-400); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+.brand-tag strong { color: var(--white); }
+.hdr-greeting { font-size: 21px; font-weight: 300; color: var(--white); line-height: 1.3; letter-spacing: -0.02em; }
+.hdr-greeting strong { font-weight: 500; }
+.hdr-sub { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
+.back-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--black); padding: 0 4px; font-family: var(--font); line-height: 1; }
+.hdr-title { font-size: 16px; font-weight: 500; color: var(--black); flex: 1; }
+.hdr-action { font-size: 12px; font-weight: 500; color: var(--white); background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 7px 14px; cursor: pointer; font-family: var(--font); }
+
+.alert-strip { background: var(--amber); padding: 10px 22px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.alert-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber-bg); flex-shrink: 0; }
+.alert-text { font-size: 12px; color: var(--amber-bg); font-weight: 500; }
+.alert-count { margin-left: auto; background: var(--amber-bg); color: var(--amber); font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 10px; }
+
+.kpi-strip { background: var(--black); padding: 0 22px 18px; display: flex; gap: 6px; flex-shrink: 0; }
+.kpi { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 9px; cursor: pointer; }
+.kpi-l { font-size: 9px; color: var(--gray-400); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 5px; }
+.kpi-v { font-size: 18px; font-weight: 500; color: var(--white); line-height: 1; font-family: var(--mono); }
+.kpi-d { font-size: 10px; margin-top: 3px; }
+.d-up { color: #5dcaa5; } .d-dn { color: #f09595; } .d-wn { color: #fac775; }
+
+.filter-row { display: flex; gap: 6px; padding: 12px 18px; background: var(--white); border-bottom: 1px solid var(--gray-100); overflow-x: auto; flex-shrink: 0; }
+.filter-row::-webkit-scrollbar { display: none; }
+.fc { font-size: 11px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--gray-100); color: var(--gray-600); background: transparent; cursor: pointer; white-space: nowrap; font-family: var(--font); }
+.fc.on { background: var(--black); color: var(--white); border-color: var(--black); }
+
+.scroll-body { flex: 1; overflow-y: auto; background: var(--gray-50); -webkit-overflow-scrolling: touch; }
+.scroll-body::-webkit-scrollbar { display: none; }
+.pad { padding: 16px 18px 100px; }
+
+.sec-l { font-size: 10px; font-weight: 500; color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; margin: 20px 0 10px; }
+.sec-l:first-child { margin-top: 0; }
+
+.card { background: var(--white); border: 1px solid var(--gray-100); border-radius: 16px; overflow: hidden; margin-bottom: 12px; }
+.row { display: flex; align-items: center; padding: 13px 16px; border-bottom: 1px solid var(--gray-100); gap: 10px; cursor: pointer; transition: background 0.1s; }
+.row:last-child { border-bottom: none; }
+.row:active { background: var(--gray-50); }
+.ri { flex: 1; min-width: 0; }
+.rt { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs { font-size: 11px; color: var(--gray-400); margin-top: 3px; line-height: 1.4; }
+.rr { text-align: right; flex-shrink: 0; }
+.rp { font-size: 14px; font-weight: 500; color: var(--black); font-family: var(--mono); }
+.rc { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+.bdg { font-size: 10px; font-weight: 500; padding: 4px 9px; border-radius: 6px; flex-shrink: 0; white-space: nowrap; }
+.bdg-live { background: var(--green-bg); color: var(--green); }
+.bdg-pend { background: var(--amber-bg); color: var(--amber); }
+.bdg-off  { background: var(--gray-100); color: var(--gray-600); }
+.bdg-new  { background: var(--blue-bg); color: var(--blue); }
+.bdg-done { background: var(--green-bg); color: var(--green); }
+.bdg-bad  { background: var(--red-bg); color: var(--red); }
+.bdg-ship { background: var(--purple-bg); color: var(--purple); }
+.bdg-inv  { background: var(--black); color: var(--white); }
+.bdg-teal { background: var(--teal-bg); color: var(--teal); }
+
+.av { width: 42px; height: 42px; border-radius: 12px; background: var(--gray-50); border: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; position: relative; }
+.unread-dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--black); border: 2px solid var(--white); }
+
+.tag-inline { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.ttag { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: var(--gray-100); color: var(--gray-600); }
+
+.sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.sum-tile { background: var(--white); border: 1px solid var(--gray-100); border-radius: 14px; padding: 14px; }
+.st-l { font-size: 10px; color: var(--gray-400); margin-bottom: 6px; }
+.st-v { font-size: 22px; font-weight: 500; color: var(--black); font-family: var(--mono); }
+.st-up { font-size: 11px; color: var(--green); margin-top: 4px; }
+.st-dn { font-size: 11px; color: var(--red); margin-top: 4px; }
+.st-s { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+.chart-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: 16px; padding: 18px; margin-bottom: 12px; }
+.cc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.cc-val { font-size: 28px; font-weight: 500; color: var(--black); font-family: var(--mono); letter-spacing: -0.02em; }
+.cc-lbl { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+.cc-period { font-size: 11px; color: var(--gray-600); background: var(--gray-50); border-radius: 6px; padding: 5px 10px; }
+
+.bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 70px; }
+.bar-g { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar-b { width: 100%; border-radius: 3px 3px 0 0; background: var(--gray-100); min-height: 3px; }
+.bar-b.hi { background: var(--black); }
+.bar-lbl { font-size: 10px; color: var(--gray-400); }
+
+/* APPROVAL CARD */
+.appr-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: 16px; padding: 16px; margin-bottom: 10px; }
+.appr-card.urgent { border-color: #efaa27; }
+.appr-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.appr-brand { font-size: 14px; font-weight: 500; color: var(--black); }
+.appr-deadline { font-size: 11px; color: var(--amber); font-weight: 500; }
+.appr-meta { font-size: 12px; color: var(--gray-600); line-height: 1.6; margin-bottom: 12px; background: var(--gray-50); border-radius: 8px; padding: 10px 12px; }
+.appr-actions { display: flex; gap: 8px; }
+.btn-approve { flex: 1; background: var(--black); color: var(--white); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font); }
+.btn-reject { flex: 1; background: transparent; color: var(--black); border: 1px solid var(--gray-200); border-radius: 10px; padding: 10px; font-size: 12px; cursor: pointer; font-family: var(--font); }
+.btn-hold { background: transparent; color: var(--gray-600); border: 1px solid var(--gray-100); border-radius: 10px; padding: 10px 14px; font-size: 12px; cursor: pointer; font-family: var(--font); }
+
+/* INVITED SECTION CARD */
+.invited-main { background: var(--black); border-radius: 16px; padding: 18px; margin-bottom: 12px; }
+.im-eye { font-size: 10px; color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.im-title { font-size: 18px; font-weight: 500; color: var(--white); margin-bottom: 4px; }
+.im-sub { font-size: 12px; color: var(--gray-400); margin-bottom: 16px; }
+.im-prog-lbl { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-400); margin-bottom: 5px; }
+.im-bar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
+.im-fill { height: 100%; background: var(--white); border-radius: 2px; }
+.im-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.im-chip { font-size: 11px; color: var(--gray-400); background: rgba(255,255,255,0.07); border-radius: 5px; padding: 4px 9px; }
+.im-chip.conf { color: #5dcaa5; background: rgba(93,202,165,0.12); }
+
+/* CHANNEL BAR */
+.ch-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--gray-100); gap: 10px; }
+.ch-row:last-child { border-bottom: none; }
+.ch-lbl { font-size: 12px; color: var(--black); width: 80px; flex-shrink: 0; }
+.ch-bg { flex: 1; height: 5px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+.ch-fill { height: 100%; border-radius: 3px; }
+.ch-pct { font-size: 12px; font-weight: 500; color: var(--black); width: 36px; text-align: right; }
+
+/* NOTICE compose */
+.compose-sec { background: var(--white); border: 1px solid var(--gray-100); border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+.cs-lbl { font-size: 10px; font-weight: 500; color: var(--gray-400); padding: 12px 14px 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+.level-opts { display: flex; gap: 8px; padding: 4px 14px 14px; }
+.lv-opt { flex: 1; border: 1px solid var(--gray-100); border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.12s; }
+.lv-opt.sel-urg { border-color: var(--red); background: var(--red-bg); }
+.lv-opt.sel-wrn { border-color: var(--amber); background: var(--amber-bg); }
+.lv-opt.sel-inf { border-color: var(--blue); background: var(--blue-bg); }
+.lv-icon { font-size: 20px; margin-bottom: 4px; }
+.lv-name { font-size: 11px; font-weight: 500; color: var(--black); }
+.lv-desc { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+
+.target-opts { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+.to-opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--gray-100); border-radius: 10px; cursor: pointer; transition: all 0.12s; }
+.to-opt.sel { border-color: var(--black); background: var(--black); }
+.to-opt.sel .to-name { color: var(--white); }
+.to-opt.sel .to-sub { color: var(--gray-400); }
+.chk-c { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--gray-200); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--black); }
+.chk-c.on { background: var(--white); border-color: var(--white); }
+.to-name { font-size: 13px; font-weight: 500; color: var(--black); }
+.to-sub { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+.to-cnt { margin-left: auto; font-size: 11px; color: var(--gray-400); background: var(--gray-50); border-radius: 8px; padding: 2px 8px; }
+.to-cnt.w { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); }
+
+.c-inp-title { width: 100%; border: none; outline: none; font-size: 14px; font-weight: 500; color: var(--black); background: transparent; font-family: var(--font); padding: 4px 14px 0; border-bottom: 1px solid var(--gray-100); }
+.c-inp-title::placeholder { color: var(--gray-200); font-weight: 400; }
+.c-inp-body { width: 100%; border: none; outline: none; font-size: 13px; color: var(--black); background: transparent; font-family: var(--font); resize: none; min-height: 70px; line-height: 1.6; padding: 10px 14px; }
+.c-inp-body::placeholder { color: var(--gray-200); }
+
+.tog-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; }
+.tog-info .tog-l { font-size: 13px; font-weight: 500; color: var(--black); }
+.tog-info .tog-s { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--black); position: relative; cursor: pointer; flex-shrink: 0; }
+.toggle-k { position: absolute; width: 20px; height: 20px; background: var(--white); border-radius: 50%; top: 3px; right: 3px; }
+
+/* NOTICE LIST */
+.notice-card { background: var(--white); border-radius: 16px; overflow: hidden; margin-bottom: 10px; border: 1px solid var(--gray-100); }
+.nc-urg { border-color: var(--red); }
+.nc-wrn { border-color: var(--amber); }
+.nb { padding: 9px 14px; display: flex; align-items: center; gap: 6px; }
+.nb-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.7); flex-shrink: 0; }
+.nb-l { font-size: 11px; font-weight: 500; color: var(--white); }
+.nb-t { margin-left: auto; font-size: 10px; color: rgba(255,255,255,0.6); }
+.nc-body { padding: 12px 14px; }
+.nc-title { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 4px; line-height: 1.4; }
+.nc-text { font-size: 12px; color: var(--gray-600); line-height: 1.5; }
+.nc-foot { padding: 9px 14px; border-top: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; background: var(--gray-50); }
+.nf-tgt { font-size: 11px; color: var(--gray-400); flex: 1; }
+.nf-read { font-size: 11px; color: var(--gray-400); }
+.nf-read strong { color: var(--black); }
+.rbar-bg { width: 60px; height: 3px; background: var(--gray-200); border-radius: 2px; overflow: hidden; }
+.rbar-fill { height: 100%; background: var(--black); border-radius: 2px; }
+
+/* MSG */
+.thread-item { display: flex; align-items: flex-start; padding: 14px 18px; border-bottom: 1px solid var(--gray-100); cursor: pointer; gap: 12px; }
+.thread-item:active { background: var(--gray-50); }
+.tb { flex: 1; min-width: 0; }
+.tt { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+.tn { font-size: 14px; font-weight: 500; color: var(--black); }
+.ttime { font-size: 11px; color: var(--gray-400); }
+.tp { font-size: 12px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
+.tp.bold { color: var(--black); font-weight: 500; }
+.tag-row2 { display: flex; gap: 4px; }
+.ttag2 { font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+.ttag-ap { background: var(--amber-bg); color: var(--amber); }
+.ttag-inv { background: var(--black); color: var(--white); }
+.ttag-ct { background: var(--blue-bg); color: var(--blue); }
+.ttag-dn { background: var(--gray-100); color: var(--gray-600); }
+
+.msg-wrap { flex: 1; overflow-y: auto; padding: 16px; background: var(--gray-50); display: flex; flex-direction: column; gap: 12px; }
+.msg-wrap::-webkit-scrollbar { display: none; }
+.date-div { text-align: center; font-size: 11px; color: var(--gray-400); }
+.mg { display: flex; flex-direction: column; gap: 3px; }
+.mg.me { align-items: flex-end; }
+.mg.them { align-items: flex-start; }
+.sender { font-size: 10px; color: var(--gray-400); padding: 0 4px; }
+.bubble { max-width: 78%; padding: 10px 13px; border-radius: 16px; font-size: 13px; line-height: 1.55; }
+.bubble.me { background: var(--black); color: var(--white); border-bottom-right-radius: 4px; }
+.bubble.them { background: var(--white); color: var(--black); border: 1px solid var(--gray-100); border-bottom-left-radius: 4px; }
+.msg-time { font-size: 10px; color: var(--gray-400); padding: 0 4px; }
+.file-bubble { max-width: 78%; background: var(--white); border: 1px solid var(--gray-100); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; cursor: pointer; }
+.fi { width: 34px; height: 34px; border-radius: 8px; background: var(--blue-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.fn { font-size: 12px; font-weight: 500; color: var(--black); }
+.fs { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+.status-b2 { align-self: center; background: var(--white); border: 1px solid var(--gray-100); border-radius: 20px; padding: 6px 14px; font-size: 11px; color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
+.sdot { width: 6px; height: 6px; border-radius: 50%; }
+.sdot.g { background: var(--green); }
+.ctx-bar { padding: 8px 16px; background: var(--amber-bg); border-bottom: 1px solid #fac775; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ctx-l { font-size: 11px; font-weight: 500; color: var(--amber); }
+
+.qr-row { padding: 10px 16px 8px; display: flex; gap: 6px; overflow-x: auto; background: var(--white); border-top: 1px solid var(--gray-100); flex-shrink: 0; }
+.qr-row::-webkit-scrollbar { display: none; }
+.qr { font-size: 11px; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--gray-200); color: var(--black); background: transparent; cursor: pointer; white-space: nowrap; font-family: var(--font); }
+.chat-input-bar { padding: 8px 14px 24px; background: var(--white); display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.attach-b { width: 38px; height: 38px; border-radius: 10px; background: var(--gray-50); border: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+.chat-inp { flex: 1; background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 20px; padding: 10px 16px; font-size: 13px; color: var(--black); outline: none; font-family: var(--font); resize: none; min-height: 38px; }
+.chat-inp::placeholder { color: var(--gray-200); }
+.send-b { width: 38px; height: 38px; border-radius: 50%; background: var(--black); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: var(--white); font-size: 16px; font-family: var(--font); }
+
+/* SETTLEMENT */
+.settle-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--gray-100); gap: 10px; }
+.settle-row:last-child { border-bottom: none; }
+.sr-t { font-size: 14px; font-weight: 500; color: var(--black); }
+.sr-s { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+.sr-v { font-size: 15px; font-weight: 500; font-family: var(--mono); color: var(--black); }
+.income { color: var(--green); font-size: 11px; margin-top: 3px; }
+.pending { color: var(--amber); font-size: 11px; margin-top: 3px; }
+
+.rb-chart { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.rb-chart-lbl { font-size: 12px; color: var(--black); width: 86px; flex-shrink: 0; }
+.rb-chart-bg { flex: 1; height: 5px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+.rb-chart-fill { height: 100%; border-radius: 3px; }
+.rb-chart-pct { font-size: 11px; color: var(--gray-400); width: 30px; text-align: right; }
+.insight { background: var(--gray-50); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--gray-600); line-height: 1.6; margin-top: 10px; }
+
+/* BNAV */
+.bnav { background: var(--white); border-top: 1px solid var(--gray-100); display: flex; padding: 10px 0 24px; flex-shrink: 0; position: absolute; bottom: 0; left: 0; right: 0; z-index: 50; }
+.bni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+.bni-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.bni-lbl { font-size: 10px; color: var(--gray-400); }
+.bni.on .bni-lbl { color: var(--black); font-weight: 500; }
+svg.nav-icon { width: 22px; height: 22px; fill: none; stroke: var(--gray-400); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.bni.on svg.nav-icon { stroke: var(--black); }
+
+.btn-primary { background: var(--black); color: var(--white); border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); }
+.btn-outline { background: transparent; color: var(--black); border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px; font-size: 13px; cursor: pointer; font-family: var(--font); }
+.btn-row { display: flex; gap: 8px; }
+
+.cta-dark { background: var(--black); border-radius: 14px; padding: 16px; cursor: pointer; }
+.cta-eye { font-size: 10px; color: var(--gray-400); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 5px; }
+.cta-title { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 3px; }
+.cta-sub { font-size: 11px; color: var(--gray-400); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.screen.active .pad > * { animation: fadeIn 0.25s ease both; }
+.screen.active .pad > *:nth-child(2) { animation-delay: 0.04s; }
+.screen.active .pad > *:nth-child(3) { animation-delay: 0.08s; }
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="statusbar">
+    <div class="notch"></div>
+    <span>9:41</span>
+    <span>●●●</span>
+  </div>
+
+  <div class="screens">
+
+    <!-- ══════ HOME ══════ -->
+    <div class="screen active" id="s-home">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center &nbsp;·&nbsp; MD<div class="md-role">MD Admin</div></div>
+        <div class="hdr-greeting">김지수 매니저님,<br><strong>오늘도 좋은 하루입니다</strong></div>
+        <div class="hdr-sub">Invited 오픈 D-17 · 승인 대기 5건</div>
+      </div>
+      <div class="alert-strip">
+        <div class="alert-dot"></div>
+        <div class="alert-text">프로모션 승인 요청 3건 — 오늘 마감</div>
+        <div class="alert-count">긴급 3</div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi" onclick="nav('s-brands')"><div class="kpi-l">입점 브랜드</div><div class="kpi-v">38</div><div class="kpi-d d-up">+4 신규</div></div>
+        <div class="kpi" onclick="nav('s-approval')"><div class="kpi-l">승인 대기</div><div class="kpi-v">5</div><div class="kpi-d d-wn">검토 필요</div></div>
+        <div class="kpi" onclick="nav('s-overview')"><div class="kpi-l">이번달 GMV</div><div class="kpi-v">₩2.1B</div><div class="kpi-d d-up">↑ 14%</div></div>
+        <div class="kpi" onclick="nav('s-notice')"><div class="kpi-l">CS 미처리</div><div class="kpi-v">7</div><div class="kpi-d d-dn">에스컬</div></div>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-brands')"><div style="font-size:24px;margin-bottom:8px;">🏷</div><div style="font-size:13px;font-weight:500;">브랜드 관리</div><div class="st-s">38개사 입점</div></div>
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-approval')"><div style="font-size:24px;margin-bottom:8px;">✅</div><div style="font-size:13px;font-weight:500;">승인 워크플로우</div><div style="font-size:11px;color:var(--red);margin-top:2px;">긴급 2건</div></div>
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-invited')"><div style="font-size:24px;margin-bottom:8px;">⭐</div><div style="font-size:13px;font-weight:500;">Invited 섹션</div><div class="st-s">D-17 · 7/10 확정</div></div>
+            <div class="sum-tile" style="cursor:pointer;" onclick="nav('s-notice')"><div style="font-size:24px;margin-bottom:8px;">📢</div><div style="font-size:13px;font-weight:500;">공지 발송</div><div class="st-s">전체 / 그룹</div></div>
+          </div>
+
+          <div class="sec-l">오늘 알림</div>
+          <div class="card">
+            <div class="row" onclick="nav('s-approval')">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+              <div class="ri"><div class="rt">아크테릭스 이미지 해상도 기준 미달</div><div class="rs">재촬영 요청 필요 · 오늘 08:30</div></div>
+              <div class="bdg bdg-bad">긴급</div>
+            </div>
+            <div class="row" onclick="nav('s-approval')">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div>
+              <div class="ri"><div class="rt">Aesop M포인트 프로모션 승인 요청</div><div class="rs">오늘 마감 · 예상 노출 82K명</div></div>
+              <div class="bdg bdg-pend">대기</div>
+            </div>
+            <div class="row" onclick="nav('s-invited')">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;"></div>
+              <div class="ri"><div class="rt">Invited 배너 시안 3종 업로드 완료</div><div class="rs">디자인팀 · 어제 17:44</div></div>
+              <div class="bdg bdg-new">확인</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni on" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- ══════ BRANDS ══════ -->
+    <div class="screen" id="s-brands">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center · MD<div class="md-role">MD Admin</div></div>
+        <div class="hdr-greeting"><strong>브랜드 관리</strong></div>
+        <div class="hdr-sub">입점 38개사 · Invited 7개사</div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">Invited</button>
+        <button class="fc">라이브</button>
+        <button class="fc">검수중</button>
+        <button class="fc">소싱 중</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="sec-l">Invited 입점 브랜드</div>
+          <div class="card">
+            <div class="row">
+              <div class="av">🏔</div>
+              <div class="ri"><div class="rt">아크테릭스</div><div class="rs">아웃도어 · 4종 · 이승민 담당</div><div class="tag-inline"><span class="ttag">테크웨어</span><span class="ttag">프리미엄</span></div></div>
+              <div style="text-align:right;"><div class="bdg bdg-inv" style="margin-bottom:4px;">Invited</div><div class="rp" style="font-size:12px;">₩42M</div></div>
+            </div>
+            <div class="row">
+              <div class="av">🌿</div>
+              <div class="ri"><div class="rt">Aesop</div><div class="rs">뷰티 · 7종 · 박현아 담당</div><div class="tag-inline"><span class="ttag">라이프스타일</span><span class="ttag">럭셔리</span></div></div>
+              <div style="text-align:right;"><div class="bdg bdg-inv" style="margin-bottom:4px;">Invited</div><div class="rp" style="font-size:12px;">₩38M</div></div>
+            </div>
+            <div class="row">
+              <div class="av">🎧</div>
+              <div class="ri"><div class="rt">Bang & Olufsen</div><div class="rs">오디오 · 3종 · 최도현 담당</div><div class="tag-inline"><span class="ttag">테크</span><span class="ttag">프리미엄</span></div></div>
+              <div style="text-align:right;"><div class="bdg bdg-pend" style="margin-bottom:4px;">검수 중</div><div class="rp" style="font-size:12px;">—</div></div>
+            </div>
+          </div>
+          <div class="sec-l">소싱 파이프라인</div>
+          <div class="card">
+            <div class="row">
+              <div class="av">🥃</div>
+              <div class="ri"><div class="rt">Laphroaig</div><div class="rs">위스키 · 협의 중 · 입점 검토</div></div>
+              <div class="bdg bdg-new">소싱 중</div>
+            </div>
+            <div class="row">
+              <div class="av">👗</div>
+              <div class="ri"><div class="rt">Maison Margiela</div><div class="rs">패션 · 계약 검토 단계</div></div>
+              <div class="bdg bdg-pend">계약 중</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni on" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- ══════ APPROVAL ══════ -->
+    <div class="screen" id="s-approval">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center · MD<div class="md-role">MD Admin</div></div>
+        <div class="hdr-greeting"><strong>승인 워크플로우</strong></div>
+        <div class="hdr-sub">긴급 2건 · 검토 대기 3건</div>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="sec-l">긴급 — 오늘 마감</div>
+          <div class="appr-card urgent">
+            <div class="appr-head"><div><div class="appr-brand">아크테릭스 — 상품 등록</div><div class="bdg bdg-pend" style="margin-top:5px;display:inline-flex;">신규 상품 3종</div></div><div class="appr-deadline">D-Day</div></div>
+            <div class="appr-meta">베타 FL 재킷 / 감마 SL 후디 / 스쿼미쉬 후드<br>요청일: 3/21 · 이승민 담당 · ₩398K–₩798K<br>M포인트 5% 적립 연동 포함</div>
+            <div class="appr-actions">
+              <button class="btn-approve" onclick="approve(this)">승인</button>
+              <button class="btn-hold" onclick="hold(this)">보류</button>
+              <button class="btn-reject" onclick="reject(this)">반려</button>
+            </div>
+          </div>
+          <div class="appr-card urgent">
+            <div class="appr-head"><div><div class="appr-brand">Aesop — 프로모션 신청</div><div class="bdg bdg-pend" style="margin-top:5px;display:inline-flex;">M포인트 10배</div></div><div class="appr-deadline">D-Day</div></div>
+            <div class="appr-meta">기간: 4/8–4/14 · Invited 런칭 연계<br>예상 노출: 82,000명 · 쿠폰 한도: 500매<br>마케팅 분담금: ₩3,000,000</div>
+            <div class="appr-actions">
+              <button class="btn-approve" onclick="approve(this)">승인</button>
+              <button class="btn-hold" onclick="hold(this)">보류</button>
+              <button class="btn-reject" onclick="reject(this)">반려</button>
+            </div>
+          </div>
+          <div class="sec-l">검토 대기</div>
+          <div class="card">
+            <div class="row"><div class="ri"><div class="rt">B&O — 가격 정책 수정</div><div class="rs">Beoplay H95 · ₩1,280K → ₩1,180K</div></div><div class="bdg bdg-new">가격변경</div></div>
+            <div class="row"><div class="ri"><div class="rt">POSTALCO — 이미지 재업로드</div><div class="rs">제품 촬영본 교체 · 6장</div></div><div class="bdg bdg-pend">콘텐츠</div></div>
+            <div class="row"><div class="ri"><div class="rt">Laphroaig — 입점 계약서</div><div class="rs">법무 검토 완료 → MD 최종 확인</div></div><div class="bdg bdg-pend">계약</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni on" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- ══════ INVITED ══════ -->
+    <div class="screen" id="s-invited">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center · MD<div class="md-role">MD Admin</div></div>
+        <div class="hdr-greeting"><strong>Invited 섹션</strong></div>
+        <div class="hdr-sub">4월 8일 오픈 · D-17</div>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="invited-main">
+            <div class="im-eye">Invited — 4월 8일 오픈</div>
+            <div class="im-title">큐레이션 준비 현황</div>
+            <div class="im-sub">M몰 신규 프리미엄 섹션</div>
+            <div class="im-prog-lbl"><span>입점 확정 7 / 목표 10</span><span>70%</span></div>
+            <div class="im-bar"><div class="im-fill" style="width:70%;"></div></div>
+            <div class="im-chips">
+              <div class="im-chip conf">아크테릭스 ✓</div>
+              <div class="im-chip conf">Aesop ✓</div>
+              <div class="im-chip conf">POSTALCO ✓</div>
+              <div class="im-chip conf">Le Labo ✓</div>
+              <div class="im-chip conf">Patagonia ✓</div>
+              <div class="im-chip conf">RIMOWA ✓</div>
+              <div class="im-chip conf">Maison Kitsuné ✓</div>
+              <div class="im-chip">B&O 검수중</div>
+              <div class="im-chip">Laphroaig 협의</div>
+              <div class="im-chip">MM 계약중</div>
+            </div>
+          </div>
+
+          <div class="sec-l">섹션 카테고리</div>
+          <div class="card">
+            <div class="row"><div style="font-size:11px;font-weight:500;color:var(--gray-400);width:20px;text-align:center;flex-shrink:0;">01</div><div class="ri"><div class="rt">테크웨어 / 아웃도어</div><div class="rs">아크테릭스, Patagonia · 9종</div></div><div class="bdg bdg-live">확정</div></div>
+            <div class="row"><div style="font-size:11px;font-weight:500;color:var(--gray-400);width:20px;text-align:center;flex-shrink:0;">02</div><div class="ri"><div class="rt">라이프스타일 뷰티</div><div class="rs">Aesop, Le Labo · 11종</div></div><div class="bdg bdg-live">확정</div></div>
+            <div class="row"><div style="font-size:11px;font-weight:500;color:var(--gray-400);width:20px;text-align:center;flex-shrink:0;">03</div><div class="ri"><div class="rt">하이파이 오디오</div><div class="rs">Bang & Olufsen · 3종</div></div><div class="bdg bdg-pend">검수 중</div></div>
+            <div class="row"><div style="font-size:11px;font-weight:500;color:var(--gray-400);width:20px;text-align:center;flex-shrink:0;">04</div><div class="ri"><div class="rt">여행 / 액세서리</div><div class="rs">RIMOWA, Maison Kitsuné · 8종</div></div><div class="bdg bdg-live">확정</div></div>
+          </div>
+
+          <div class="cta-dark">
+            <div class="cta-eye">런칭 준비</div>
+            <div class="cta-title">D-17 MD 체크리스트 →</div>
+            <div class="cta-sub">Invited 섹션 오픈 전 필수 확인 사항</div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- ══════ OVERVIEW (매출·정산) ══════ -->
+    <div class="screen" id="s-overview">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center · MD<div class="md-role">MD Admin</div></div>
+        <div class="hdr-greeting"><strong>전체 현황</strong></div>
+        <div class="hdr-sub">GMV · 정산 · 채널별 분석</div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">이번 달</button>
+        <button class="fc">지난 달</button>
+        <button class="fc">3개월</button>
+        <button class="fc">6개월</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="chart-card">
+            <div class="cc-head">
+              <div><div class="cc-val">₩2.1B</div><div class="cc-lbl">3월 전체 GMV</div></div>
+              <div class="cc-period">2026.03</div>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-g"><div class="bar-b" style="height:45%;"></div><div class="bar-lbl">1주</div></div>
+              <div class="bar-g"><div class="bar-b" style="height:58%;"></div><div class="bar-lbl">2주</div></div>
+              <div class="bar-g"><div class="bar-b hi" style="height:80%;"></div><div class="bar-lbl">3주</div></div>
+              <div class="bar-g"><div class="bar-b" style="height:20%;background:transparent;border:1.5px dashed var(--gray-200);"></div><div class="bar-lbl">4주</div></div>
+            </div>
+          </div>
+
+          <div class="sum-grid">
+            <div class="sum-tile"><div class="st-l">전체 GMV</div><div class="st-v">₩2.1B</div><div class="st-up">↑ 14.2%</div></div>
+            <div class="sum-tile"><div class="st-l">평균 객단가</div><div class="st-v">₩182K</div><div class="st-up">↑ 8.7%</div></div>
+            <div class="sum-tile"><div class="st-l">신규 고객</div><div class="st-v">3,241</div><div class="st-up">↑ 22%</div></div>
+            <div class="sum-tile"><div class="st-l">전체 반품율</div><div class="st-v">2.3%</div><div class="st-dn">↑ 0.4%p</div></div>
+          </div>
+
+          <div class="sec-l">채널별 GMV 비중</div>
+          <div class="card">
+            <div class="ch-row"><div class="ch-lbl">M몰 일반</div><div class="ch-bg"><div class="ch-fill" style="width:58%;background:var(--black);"></div></div><div class="ch-pct">58%</div></div>
+            <div class="ch-row"><div class="ch-lbl">Invited</div><div class="ch-bg"><div class="ch-fill" style="width:24%;background:var(--amber);"></div></div><div class="ch-pct">24%</div></div>
+            <div class="ch-row"><div class="ch-lbl">기획전</div><div class="ch-bg"><div class="ch-fill" style="width:12%;background:var(--blue);"></div></div><div class="ch-pct">12%</div></div>
+            <div class="ch-row"><div class="ch-lbl">타임딜</div><div class="ch-bg"><div class="ch-fill" style="width:6%;background:var(--gray-400);"></div></div><div class="ch-pct">6%</div></div>
+          </div>
+
+          <div class="sec-l">브랜드별 GMV TOP 5</div>
+          <div class="card">
+            <div class="row"><div style="font-size:16px;font-weight:500;color:var(--gray-200);width:24px;text-align:center;flex-shrink:0;">1</div><div class="ri"><div class="rt">아크테릭스</div><div class="rs">184건</div></div><div class="rr"><div class="rp">₩42M</div><div class="rc" style="color:var(--green);">↑ 22%</div></div></div>
+            <div class="row"><div style="font-size:16px;font-weight:500;color:var(--gray-200);width:24px;text-align:center;flex-shrink:0;">2</div><div class="ri"><div class="rt">Aesop</div><div class="rs">261건</div></div><div class="rr"><div class="rp">₩38M</div><div class="rc" style="color:var(--green);">↑ 18%</div></div></div>
+            <div class="row"><div style="font-size:16px;font-weight:500;color:var(--gray-200);width:24px;text-align:center;flex-shrink:0;">3</div><div class="ri"><div class="rt">POSTALCO</div><div class="rs">412건</div></div><div class="rr"><div class="rp">₩19M</div><div class="rc" style="color:var(--green);">↑ 5%</div></div></div>
+            <div class="row"><div style="font-size:16px;font-weight:500;color:var(--gray-200);width:24px;text-align:center;flex-shrink:0;">4</div><div class="ri"><div class="rt">Le Labo</div><div class="rs">189건</div></div><div class="rr"><div class="rp">₩17M</div><div class="rc" style="color:var(--red);">↓ 3%</div></div></div>
+            <div class="row"><div style="font-size:16px;font-weight:500;color:var(--gray-200);width:24px;text-align:center;flex-shrink:0;">5</div><div class="ri"><div class="rt">Patagonia</div><div class="rs">203건</div></div><div class="rr"><div class="rp">₩14M</div><div class="rc" style="color:var(--green);">↑ 11%</div></div></div>
+          </div>
+
+          <div class="sec-l">정산 예정</div>
+          <div class="card">
+            <div class="settle-row"><div style="flex:1;"><div class="sr-t">3월 2차 정산</div><div class="sr-s">3/16–3/22 · 전체 38개사</div></div><div style="text-align:right;"><div class="sr-v">₩284,000,000</div><div class="pending">D-5 입금 예정</div></div></div>
+            <div class="settle-row"><div style="flex:1;"><div class="sr-t">3월 1차 정산</div><div class="sr-s">3/1–3/15 · 전체 38개사</div></div><div style="text-align:right;"><div class="sr-v">₩612,000,000</div><div class="income">입금 완료</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni on" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- ══════ MESSAGES ══════ -->
+    <div class="screen" id="s-messages">
+      <div class="hdr-dark">
+        <div class="brand-tag"><strong>M</strong> Seller Center · MD<div class="md-role">MD Admin</div></div>
+        <div class="hdr-greeting"><strong>메시지</strong></div>
+        <div class="hdr-sub">브랜드 담당자와의 커뮤니케이션</div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">미확인</button>
+        <button class="fc">승인 대기</button>
+        <button class="fc">Invited</button>
+        <button class="fc">콘텐츠</button>
+      </div>
+      <div class="scroll-body" style="background:var(--white);">
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">🏔<div class="unread-dot"></div></div>
+          <div class="tb"><div class="tt"><div class="tn">아크테릭스 코리아</div><div class="ttime">방금</div></div><div class="tp bold">베타 FL 재킷 이미지 4장 첨부했습니다. 검토 부탁드립니다.</div><div class="tag-row2"><span class="ttag2 ttag-ap">승인 대기</span><span class="ttag2 ttag-inv">Invited</span></div></div>
+        </div>
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">🌿</div>
+          <div class="tb"><div class="tt"><div class="tn">Aesop Korea</div><div class="ttime">14분 전</div></div><div class="tp">M포인트 10배 프로모션 기간 조정 관련 문의드립니다.</div><div class="tag-row2"><span class="ttag2 ttag-ap">승인 대기</span></div></div>
+        </div>
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">🎧<div class="unread-dot"></div></div>
+          <div class="tb"><div class="tt"><div class="tn">Bang & Olufsen</div><div class="ttime">1시간 전</div></div><div class="tp bold">재촬영 가이드라인 전달드립니다.</div><div class="tag-row2"><span class="ttag2 ttag-ct">콘텐츠</span></div></div>
+        </div>
+        <div class="thread-item" onclick="nav('s-chat')">
+          <div class="av">✏️</div>
+          <div class="tb"><div class="tt"><div class="tn">POSTALCO</div><div class="ttime">어제</div></div><div class="tp">4월 기획전 참여 여부 확인 부탁드립니다.</div><div class="tag-row2"><span class="ttag2 ttag-dn">완료</span></div></div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni on" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="screen" id="s-chat" style="background:var(--white);">
+      <div class="hdr-light">
+        <button class="back-btn" onclick="nav('s-messages')">‹</button>
+        <div style="width:34px;height:34px;border-radius:9px;background:var(--gray-50);border:1px solid var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏔</div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:500;">아크테릭스 코리아</div><div style="font-size:11px;color:var(--gray-400);">이승민 담당 · Invited 입점</div></div>
+        <div class="bdg bdg-inv" style="font-size:10px;">Invited</div>
+      </div>
+      <div class="ctx-bar">
+        <div class="ctx-l">승인 대기</div>
+        <div style="width:1px;height:12px;background:#fac775;"></div>
+        <div style="font-size:11px;color:var(--amber);">베타 FL 재킷 외 2종 — 상품 등록 검토 중</div>
+      </div>
+      <div class="msg-wrap" id="mdMsgWrap">
+        <div class="date-div">3월 21일 금요일</div>
+        <div class="mg them"><div class="sender">이승민 · 아크테릭스</div><div class="bubble them">안녕하세요 김지수 매니저님, Invited 섹션 런칭 관련해서 신규 상품 3종 등록 요청드립니다.</div><div class="msg-time">오후 2:14</div></div>
+        <div class="mg them"><div class="file-bubble"><div class="fi">📄</div><div><div class="fn">상품_등록_요청서_ARC_0321.pdf</div><div class="fs">PDF · 2.3 MB</div></div></div><div class="msg-time">오후 2:15</div></div>
+        <div class="mg me"><div class="bubble me">확인했습니다. 이미지 사양 검토 후 오늘 내로 피드백 드리겠습니다.</div><div class="msg-time">오후 3:02</div></div>
+        <div class="status-b2"><div class="sdot" style="background:var(--amber);"></div><span>이미지 사양 검토 중</span></div>
+        <div class="date-div">오늘 · 3월 22일</div>
+        <div class="mg me"><div class="bubble me">이미지 검토 완료했습니다. 베타 FL·감마 SL은 통과인데요, 스쿼미쉬 후드 1장이 해상도 기준 미달이에요. 재업로드 필요합니다.</div><div class="msg-time">오전 9:18</div></div>
+        <div class="status-b2"><div class="sdot g"></div><span>이미지 재업로드 완료 · 승인 대기</span></div>
+      </div>
+      <div class="qr-row">
+        <button class="qr" onclick="addMdMsg('이미지 확인 후 최종 승인 처리하겠습니다.')">✓ 승인 처리</button>
+        <button class="qr" onclick="addMdMsg('추가 수정이 필요합니다. 반려 처리합니다.')">반려 처리</button>
+        <button class="qr" onclick="addMdMsg('이미지 사양 기준에 맞게 재업로드 부탁드립니다.')">재업로드 요청</button>
+        <button class="qr" onclick="addMdMsg('확인했습니다.')">확인</button>
+      </div>
+      <div class="chat-input-bar">
+        <div class="attach-b">+</div>
+        <textarea class="chat-inp" id="mdChatInp" placeholder="메시지 입력..." rows="1"></textarea>
+        <button class="send-b" onclick="sendMdMsg()">↑</button>
+      </div>
+    </div>
+
+    <!-- ══════ NOTICE ══════ -->
+    <div class="screen" id="s-notice">
+      <div class="hdr-dark">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div class="brand-tag" style="margin-bottom:0;"><strong>M</strong> Seller Center · MD</div>
+          <div class="md-role">MD Admin</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div><div class="hdr-greeting"><strong>공지 발송</strong></div><div class="hdr-sub">전체 및 그룹 브로드캐스트</div></div>
+          <button class="hdr-action" onclick="nav('s-notice-compose')">+ 새 공지</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <button class="fc on">전체</button>
+        <button class="fc">긴급</button>
+        <button class="fc">주의</button>
+        <button class="fc">일반</button>
+        <button class="fc">Invited</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="notice-card nc-urg">
+            <div class="nb" style="background:#dc3030;"><div class="nb-dot"></div><div class="nb-l">긴급 공지</div><div class="nb-t">오늘 08:02</div></div>
+            <div class="nc-body"><div class="nc-title">M몰 결제 시스템 점검 — 오늘 23:00–01:00</div><div class="nc-text">금일 23시부터 2시간 동안 점검이 진행됩니다. 주문 접수 및 정산 처리 중단.</div></div>
+            <div class="nc-foot"><div class="nf-tgt">전체 브랜드 38개사</div><div class="nf-read"><strong>31</strong> / 38 확인</div><div class="rbar-bg"><div class="rbar-fill" style="width:82%;"></div></div></div>
+          </div>
+          <div class="notice-card nc-wrn">
+            <div class="nb" style="background:var(--amber);"><div class="nb-dot"></div><div class="nb-l">주의 공지</div><div class="nb-t">어제 14:30</div></div>
+            <div class="nc-body"><div class="nc-title">Invited 섹션 상품 이미지 가이드 업데이트</div><div class="nc-text">4월 8일 오픈 대비 이미지 사양 변경. 최소 해상도 2,400px, 배경 순백 필수.</div></div>
+            <div class="nc-foot"><div class="nf-tgt">Invited 브랜드 7개사</div><div class="nf-read"><strong>6</strong> / 7 확인</div><div class="rbar-bg"><div class="rbar-fill" style="width:86%;"></div></div></div>
+          </div>
+          <div class="notice-card">
+            <div class="nb" style="background:var(--blue);"><div class="nb-dot"></div><div class="nb-l">일반 공지</div><div class="nb-t">3/20</div></div>
+            <div class="nc-body"><div class="nc-title">3월 2차 정산 일정 안내</div><div class="nc-text">3월 16일–22일 정산분은 3월 27일 입금 예정입니다.</div></div>
+            <div class="nc-foot"><div class="nf-tgt">전체 브랜드 38개사</div><div class="nf-read"><strong>38</strong> / 38 확인</div><div class="rbar-bg"><div class="rbar-fill" style="width:100%;background:var(--blue);"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bni" onclick="nav('s-home')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="bni-lbl">홈</div></div>
+        <div class="bni" onclick="nav('s-brands')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="bni-lbl">브랜드</div></div>
+        <div class="bni" onclick="nav('s-overview')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="bni-lbl">현황</div></div>
+        <div class="bni" onclick="nav('s-messages')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="bni-lbl">메시지</div></div>
+        <div class="bni on" onclick="nav('s-notice')"><div class="bni-icon"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="bni-lbl">공지</div></div>
+      </div>
+    </div>
+
+    <!-- NOTICE COMPOSE -->
+    <div class="screen" id="s-notice-compose">
+      <div class="hdr-light">
+        <button class="back-btn" onclick="nav('s-notice')">‹</button>
+        <div class="hdr-title">새 공지 작성</div>
+        <button class="btn-primary" id="sendBtn" style="padding:8px 16px;font-size:12px;border-radius:8px;" onclick="doSend()">발송</button>
+      </div>
+      <div class="scroll-body">
+        <div class="pad">
+          <div class="compose-sec">
+            <div class="cs-lbl">긴급 레벨</div>
+            <div class="level-opts">
+              <div class="lv-opt sel-urg" id="lv-urgent" onclick="selLv('urgent')"><div class="lv-icon">🔴</div><div class="lv-name" style="color:var(--red);">긴급</div><div class="lv-desc">즉시 푸시</div></div>
+              <div class="lv-opt" id="lv-warn" onclick="selLv('warn')"><div class="lv-icon">🟡</div><div class="lv-name">주의</div><div class="lv-desc">푸시 알림</div></div>
+              <div class="lv-opt" id="lv-info" onclick="selLv('info')"><div class="lv-icon">🔵</div><div class="lv-name">일반</div><div class="lv-desc">피드 노출</div></div>
+            </div>
+          </div>
+          <div class="compose-sec">
+            <div class="cs-lbl">발송 대상</div>
+            <div class="target-opts">
+              <div class="to-opt sel" id="to-all" onclick="selTo('all')"><div class="chk-c on" id="ck-all">✓</div><div><div class="to-name" style="color:var(--white);">전체 브랜드</div><div class="to-sub">모든 입점사</div></div><div class="to-cnt w">38개사</div></div>
+              <div class="to-opt" id="to-invited" onclick="selTo('invited')"><div class="chk-c" id="ck-invited"></div><div><div class="to-name">Invited 브랜드</div><div class="to-sub">Invited 섹션 입점사</div></div><div class="to-cnt">7개사</div></div>
+              <div class="to-opt" id="to-new" onclick="selTo('new')"><div class="chk-c" id="ck-new"></div><div><div class="to-name">신규 입점 브랜드</div><div class="to-sub">최근 3개월 내 입점</div></div><div class="to-cnt">4개사</div></div>
+            </div>
+          </div>
+          <div class="compose-sec">
+            <div class="cs-lbl">공지 내용</div>
+            <input class="c-inp-title" id="noticeTitle" placeholder="제목을 입력하세요" style="display:block;padding:10px 14px;" />
+            <textarea class="c-inp-body" id="noticeBody" placeholder="내용을 입력하세요&#10;&#10;긴급 공지는 앱 푸시 + 메시지함 + 상단 배너에 동시 노출됩니다."></textarea>
+          </div>
+          <div class="compose-sec">
+            <div class="cs-lbl">발송 설정</div>
+            <div class="tog-row"><div class="tog-info"><div class="tog-l">앱 푸시 알림</div><div class="tog-s">수신 동의 브랜드에 즉시 발송</div></div><div class="toggle"><div class="toggle-k"></div></div></div>
+            <div style="height:1px;background:var(--gray-100);margin:0 14px;"></div>
+            <div class="tog-row"><div class="tog-info"><div class="tog-l">수신 확인 요청</div><div class="tog-s">브랜드가 확인 버튼 누를 때 기록</div></div><div class="toggle"><div class="toggle-k"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+</div><!-- /device -->
+
+<script>
+function nav(id) {
+  const all = document.querySelectorAll('.screen');
+  const cur = document.querySelector('.screen.active');
+  if (cur && cur.id === id) return;
+  if (cur) { cur.classList.remove('active'); cur.classList.add('behind'); setTimeout(() => cur.classList.remove('behind'), 350); }
+  const t = document.getElementById(id);
+  if (t) { t.classList.add('active'); t.querySelector('.scroll-body')?.scrollTo(0,0); }
+}
+
+function approve(btn) { btn.textContent = '✓ 승인됨'; btn.style.background = '#2d6a2d'; btn.disabled = true; }
+function reject(btn) { btn.textContent = '반려됨'; btn.style.color = 'var(--red)'; btn.disabled = true; }
+function hold(btn) { btn.textContent = '보류됨'; btn.disabled = true; }
+
+function selLv(lv) {
+  ['urgent','warn','info'].forEach(l => document.getElementById('lv-'+l).classList.remove('sel-urg','sel-wrn','sel-inf'));
+  document.getElementById('lv-'+lv).classList.add('sel-'+({'urgent':'urg','warn':'wrn','info':'inf'}[lv]));
+  const btn = document.getElementById('sendBtn');
+  btn.style.background = lv==='urgent'?'var(--red)':lv==='warn'?'var(--amber)':'var(--blue)';
+}
+
+function selTo(t) {
+  ['all','invited','new'].forEach(id => {
+    const o = document.getElementById('to-'+id); const c = document.getElementById('ck-'+id);
+    o.classList.remove('sel'); c.classList.remove('on'); c.textContent='';
+    o.querySelector('.to-name').style.color=''; o.querySelector('.to-cnt').classList.remove('w');
+  });
+  const s = document.getElementById('to-'+t); const c = document.getElementById('ck-'+t);
+  s.classList.add('sel'); c.classList.add('on'); c.textContent='✓';
+  s.querySelector('.to-name').style.color='var(--white)'; s.querySelector('.to-cnt').classList.add('w');
+}
+
+function doSend() {
+  const t = document.getElementById('noticeTitle').value.trim();
+  const b = document.getElementById('noticeBody').value.trim();
+  const btn = document.getElementById('sendBtn');
+  if (!t || !b) { btn.textContent = '입력 필요'; setTimeout(()=>btn.textContent='발송',1500); return; }
+  btn.textContent = '✓ 발송 완료'; btn.style.background = 'var(--green)';
+  setTimeout(() => { nav('s-notice'); btn.textContent='발송'; btn.style.background='var(--black)'; }, 1200);
+}
+
+function addMdMsg(text) {
+  const w = document.getElementById('mdMsgWrap');
+  const g = document.createElement('div'); g.className = 'mg me';
+  g.innerHTML = '<div class="bubble me">'+text+'</div><div class="msg-time">방금</div>';
+  w.appendChild(g); w.scrollTop = w.scrollHeight;
+}
+function sendMdMsg() {
+  const inp = document.getElementById('mdChatInp'); const v = inp.value.trim();
+  if (!v) return; addMdMsg(v); inp.value = '';
+}
+document.getElementById('mdChatInp').addEventListener('keydown', e => { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMdMsg();} });
+
+document.querySelectorAll('.filter-row').forEach(row => {
+  row.querySelectorAll('.fc').forEach(btn => {
+    btn.addEventListener('click', function() { row.querySelectorAll('.fc').forEach(b=>b.classList.remove('on')); this.classList.add('on'); });
+  });
+});
+</script>
+</body>
+</html>
